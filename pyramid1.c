@@ -50,27 +50,24 @@ int rescale(unsigned w, unsigned h) {
 
 /* Rebuild graph configuration */
 
-int rebuild() {              /* depending on graph ! */
-    static XPoint vconf[] = {/* vertex location in x,y cells */
-                             {4, 4},
-                             {1, 4},
-                             {7, 4},
-                             {4, 7},
-                             {4, 1}};                /* vconf */
-    static int fconf3[NF3][(3 + 1)] = {              /* Vertex index */
-                                       {0, 4, 2, 0}, /* for 3-top faces */
-                                       {0, 1, 4, 0}, /* (begin = end vertex) */
-                                       {0, 3, 1, 0},
+int rebuild() {                                       /* depending on graph ! */
+    static XPoint vconf[] = {                         /* vertex location in x,y cells */
+                             {9, 9},                  // 0
+                             {9, 1},                  // 1
+                             {17, 17},                // 2
+                             {1, 17}};                // 3            /* vconf */
+    static int fconf3[NF3][(3 + 1)] = {               /* Vertex index */
+                                       {0, 1, 2, 0},  /* for 3-top faces */
+                                       {0, 1, 3, 0},  /* (begin = end vertex) */
                                        {0, 2, 3, 0}}; /* fconf3 */
     /* static int fconf4[NF4][(4+1)] = { ... };  & etc. */
     static int econf[NEDGE][2] = {
         /* 2 Vertex index for each edge */
-        {0, 1}, {0, 2}, {0, 3}, {0, 4}, /* incident vertex 0 */
-        {1, 3}, {1, 4},                 /* incident vertex 1 */
-        {2, 3}, {2, 4}                  /* incident vertex 2 */
-    };                                  /* edge */
-    int i, j;                           /* vertex, edge, face index */
-    for (i = 0; i < NVERT; i++) {       /* compute vertex pixel location */
+        {0, 1}, {0, 2}, {0, 3},                        /* incident vertex 0 */
+        {1, 3}, {1, 2}, {2, 3} /* incident vertex 1 */ /* incident vertex 2 */
+    };                                                 /* edge */
+    int i, j;                                          /* vertex, edge, face index */
+    for (i = 0; i < NVERT; i++) {                      /* compute vertex pixel location */
         vertex[i].x = scale.x * vconf[i].x;
         vertex[i].y = scale.y * vconf[i].y;
     }                             /* for-vertex */
