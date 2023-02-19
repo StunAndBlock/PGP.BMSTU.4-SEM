@@ -50,24 +50,42 @@ int rescale(unsigned w, unsigned h) {
 
 /* Rebuild graph configuration */
 
-int rebuild() {                                       /* depending on graph ! */
-    static XPoint vconf[] = {                         /* vertex location in x,y cells */
-                             {9, 9},                  // 0
-                             {9, 1},                  // 1
-                             {17, 17},                // 2
-                             {1, 17}};                // 3            /* vconf */
-    static int fconf3[NF3][(3 + 1)] = {               /* Vertex index */
-                                       {0, 1, 2, 0},  /* for 3-top faces */
-                                       {0, 1, 3, 0},  /* (begin = end vertex) */
-                                       {0, 2, 3, 0}}; /* fconf3 */
+int rebuild() { /* depending on graph ! */
+    static XPoint vconf[] = {
+        /* vertex location in x,y cells */
+        {9, 1},    // 0
+        {1, 17},   // 1
+        {17, 17},  // 2
+        {7, 9},    // 3
+        {9, 8},    // 4
+        {11, 9},   // 5                        /* vconf */
+        {11, 12},  // 6
+        {9, 13},   // 7
+        {7, 12},   // 8
+        {8, 10},   // 9
+        {10, 10},  // 10
+        {9, 12}    // 11
+    };
+    static int fconf3[NF3][(3 + 1)] = {
+        /* Vertex index */
+        {0, 1, 3, 0}, /* for 3-top faces */
+        {0, 4, 3, 0}, /* (begin = end vertex) */
+        {0, 4, 5, 0},  {0, 5, 2, 0},  {2, 6, 5, 2},  {2, 6, 7, 2},  {2, 7, 1, 2},  {1, 7, 8, 1},
+        {1, 8, 3, 1},  {8, 7, 11, 8}, {8, 11, 9, 8}, {8, 9, 3, 8},  {6, 7, 11, 6}, {6, 11, 10, 6},
+        {6, 5, 10, 6}, {4, 9, 3, 4},  {4, 9, 10, 4}, {4, 10, 5, 4}, {9, 10, 11, 9} /* fconf3 */
+
+    };
     /* static int fconf4[NF4][(4+1)] = { ... };  & etc. */
     static int econf[NEDGE][2] = {
-        /* 2 Vertex index for each edge */
-        {0, 1}, {0, 2}, {0, 3},                        /* incident vertex 0 */
-        {1, 3}, {1, 2}, {2, 3} /* incident vertex 1 */ /* incident vertex 2 */
-    };                                                 /* edge */
-    int i, j;                                          /* vertex, edge, face index */
-    for (i = 0; i < NVERT; i++) {                      /* compute vertex pixel location */
+        //     /* 2 Vertex index for each edge */
+        {0, 1},  {0, 2}, {0, 3},  {0, 4},  {0, 5}, /* incident vertex 0 */
+        {3, 4},  {4, 5}, {1, 8},  {1, 7},  {1, 2},  {1, 3},  {2, 7},  {2, 6},   {2, 5},
+        {7, 6},  {6, 5}, {8, 3},  {8, 7},  {7, 11}, {11, 6}, {11, 8}, {11, 10}, {11, 9},
+        {4, 10}, {4, 9}, {10, 5}, {10, 6}, {10, 9}, {9, 8},  {9, 3} /* incident vertex 1 */
+        /* incident vertex 2 */
+    };                            /* edge */
+    int i, j;                     /* vertex, edge, face index */
+    for (i = 0; i < NVERT; i++) { /* compute vertex pixel location */
         vertex[i].x = scale.x * vconf[i].x;
         vertex[i].y = scale.y * vconf[i].y;
     }                             /* for-vertex */
