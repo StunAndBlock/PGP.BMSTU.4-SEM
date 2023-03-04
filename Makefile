@@ -1,11 +1,11 @@
 
-all: xfloor format
+all: W13 format
 
-xfloor: xfloor.c
-	cc -o build/xfloor xfloor.c -lX11 
+xfloor: W13.c
+	cc -o build/W13 W13/W13.c -lX11 
 
 format:
-	clang-format -i *.c
+	clang-format -i W13/*.c
 
 clean:
 	rm -rf build/*
