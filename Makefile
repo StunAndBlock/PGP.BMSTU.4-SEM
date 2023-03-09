@@ -1,14 +1,25 @@
+.PHONY: format clean rebuild
+BUILD=build/$(PROJ)
 
-all: W13 format
+all:W21
 
 xfloor: W13.c
-	cc -o build/W13 W13/W13.c -lX11 
+	cc -o $(BUILD) W13/W13.c -lX11 
+
+W21: W21_C winW21Handler_C format
+	cc -o $(BUILD) W21.o winW21Handler.o -lX11 -g
+
+W21_C:
+	cc -c $(PROJ)/W21.c 
+
+winW21Handler_C: 
+	cc -c $(PROJ)/winW21Handler.c 
 
 format:
-	clang-format -i W13/*.c
+	clang-format -i $(PROJ)/*.c $(PROJ)/*.h
 
 clean:
-	rm -rf build/*
+	rm -rf $(BUILD) $(PROJ)/*.o
 
 rebuild: clean all
 
