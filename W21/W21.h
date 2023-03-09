@@ -5,11 +5,14 @@
 
 typedef struct winHandl {
   Display *dpy;
-  int scr;
-  int depth;
   Window root;
   Window *boxes;
 } winHandl;
+typedef struct envParams {
+  short boxCount;
+  short** boxParsed;
+}
+
 
 void inform(const char *, char);
 

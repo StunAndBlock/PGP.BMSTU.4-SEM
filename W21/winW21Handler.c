@@ -3,9 +3,17 @@
 
 
 
-void createEnv(winHandl* newEnv){
+void createEnv(winHandl* newEnv,char* args[]){
 newEnv->dpy=XOpenDisplay(NULL);
-src=
+int scr=DefaultScreen(dpy);
+int depth=DefaultDepth(dpy,scr);
+
+
+
+ parseBoxes(){
+
+
+
 
 
 }
