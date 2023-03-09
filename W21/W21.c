@@ -6,7 +6,8 @@ int main(unsigned short argc, char *argv[]) {
   if (argc < 2) {
     inform("no boxes inputted\nEXMAPLE: ./<programm_name> 14x23 143x10\n", -1);
   }
-
+    winHandl newEnv;
+    createEnv(&newEnv);
   return 0;
 }
 
