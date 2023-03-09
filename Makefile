@@ -22,7 +22,7 @@ format:
 	clang-format -i $(PROJ)/*.c $(PROJ)/*.h
 
 clean:
-	rm -rf $(BUILD) $(PROJ)/*.o
+	rm -rf $(BUILD) *.o
 
 rebuild: clean all
 
