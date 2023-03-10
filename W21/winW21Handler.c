@@ -28,18 +28,32 @@ void createEnv(winHandl *newEnv, envParams *newEnvParams, char **args) {
   XSizeHints hint;
   attr.override_redirect = False;
   attr.background_pixel = WhitePixel(newEnv->dpy, scr);
-  attr.event_mask = (ButtonPressMask | KeyPressMask);
+  attr.event_mask = (ButtonPressMask | KeyPressMask | ExposureMask);
   newEnv->root = XCreateWindow(
-      newEnv->dpy, DefaultRootWindow(newEnv->dpy), 0, 0, rootWindowSize.box[X],
-      rootWindowSize.box[Y], 0, depth, InputOutput, CopyFromParent,
-      (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
+      newEnv->dpy, DefaultRootWindow(newEnv->dpy), 100, 500,
+      rootWindowSize.box[X], rootWindowSize.box[Y], 0, depth, InputOutput,
+      CopyFromParent, (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
   hint.flags = (PMinSize | PMaxSize | PPosition);
   hint.min_width = hint.max_width = rootWindowSize.box[X];
   hint.min_height = hint.max_height = rootWindowSize.box[Y];
-  hint.x = 0;
-  hint.y = 0;
+  hint.x = 100;
+  hint.y = 500;
   XSetNormalHints(newEnv->dpy, newEnv->root, &hint);
+
+  newEnv->boxes = (Window *)malloc(sizeof(Window) * newEnvParams->boxCount);
+  attr.override_redirect = True;
+  attr.event_mask = (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask);
+  attr.background_pixel = 0xFF0000;
+  for (unsigned short i = 0; i < newEnvParams->boxCount; i++) {
+    newEnv->boxes[i] = XCreateWindow(
+        newEnv->dpy, newEnv->root, newEnvParams->boxPoses[i].box[X],
+        newEnvParams->boxPoses[i].box[Y], newEnvParams->boxSizes[i].box[X],
+        newEnvParams->boxSizes[i].box[Y], 1, depth, InputOutput, CopyFromParent,
+        (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
+  }
+
   XMapWindow(newEnv->dpy, newEnv->root);
+  XMapSubwindows(newEnv->dpy, newEnv->root);
   free(newEnvParams->boxSizes);
   free(newEnvParams->boxPoses);
 }
@@ -47,7 +61,7 @@ void createEnv(winHandl *newEnv, envParams *newEnvParams, char **args) {
 dArr parseBoxes(char **args, envParams *newEnvParams) {
   unsigned int *ptr = (unsigned int *)malloc(sizeof(unsigned int));
   dArr rootWindowSize;
-  rootWindowSize.box[X] = 0;
+  rootWindowSize.box[X] = 4;
   rootWindowSize.box[Y] = 0;
   unsigned int X_V = 0;
   unsigned int Y_V = 0;
@@ -75,10 +89,11 @@ dArr parseBoxes(char **args, envParams *newEnvParams) {
       inform("\tWARNING Y IS EMPTY, TRYING TO MAKE A SQUARE", 1);
       if (newEnvParams->boxSizes[j - 1].box[Y]) {
         inform("\t\t\t  ->ACCEPTED\n", 1);
-        rootWindowSize.box[Y] += newEnvParams->boxSizes[j - 1].box[Y] + 4;
-        rootWindowSize.box[X] += newEnvParams->boxSizes[j - 1].box[X] + 4;
         newEnvParams->boxPoses[j - 1].box[Y] = 0;
         newEnvParams->boxPoses[j - 1].box[X] = rootWindowSize.box[X];
+        rootWindowSize.box[Y] += newEnvParams->boxSizes[j - 1].box[Y] + 4;
+        rootWindowSize.box[X] += newEnvParams->boxSizes[j - 1].box[X] + 4;
+
       } else {
         inform("\tZERO VALUE\t  ->SKIPPED\n", 1);
         j--;
@@ -96,10 +111,11 @@ dArr parseBoxes(char **args, envParams *newEnvParams) {
       inform("\tWARNING X IS EMPTY, TRYING TO MAKE A SQUARE", 1);
       if (newEnvParams->boxSizes[j - 1].box[X]) {
         inform("\t\t\t  ->ACCEPTED\n", 1);
-        rootWindowSize.box[Y] += newEnvParams->boxSizes[j - 1].box[Y] + 4;
-        rootWindowSize.box[X] += newEnvParams->boxSizes[j - 1].box[X] + 4;
         newEnvParams->boxPoses[j - 1].box[Y] = 0;
         newEnvParams->boxPoses[j - 1].box[X] = rootWindowSize.box[X];
+        rootWindowSize.box[Y] += newEnvParams->boxSizes[j - 1].box[Y] + 4;
+        rootWindowSize.box[X] += newEnvParams->boxSizes[j - 1].box[X] + 4;
+
       } else {
         inform("\tZERO VALUE\t  ->SKIPPED\n", 1);
         j--;
@@ -114,11 +130,11 @@ dArr parseBoxes(char **args, envParams *newEnvParams) {
       if (newEnvParams->boxSizes[j - 1].box[X] &&
           newEnvParams->boxSizes[j - 1].box[Y]) {
         inform("\t\t\t\t\t\t\t\t\t  ->ACCEPTED\n", 1);
-
-        rootWindowSize.box[Y] += newEnvParams->boxSizes[j - 1].box[Y] + 4;
-        rootWindowSize.box[X] += newEnvParams->boxSizes[j - 1].box[X] + 4;
         newEnvParams->boxPoses[j - 1].box[Y] = 0;
         newEnvParams->boxPoses[j - 1].box[X] = rootWindowSize.box[X];
+        rootWindowSize.box[Y] += newEnvParams->boxSizes[j - 1].box[Y] + 4;
+        rootWindowSize.box[X] += newEnvParams->boxSizes[j - 1].box[X] + 4;
+
       } else {
         inform("\t\t\t\t\t\t\tZERO VALUE\t  ->SKIPPED\n", 1);
         j--;
