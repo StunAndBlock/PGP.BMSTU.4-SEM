@@ -26,4 +26,5 @@ void inform(const char *, char);
 dArr parseBoxes(char **, envParams *newEnvParams);
 unsigned short uItos(unsigned int);
 void dispatch();
+unsigned char checkForOverlap(Window, Window, Display *dpy);
 #endif /*W21_H_*/
