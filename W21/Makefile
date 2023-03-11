@@ -13,3 +13,5 @@ envW21Handler_C:
 
 INFORM_C:
 	cc -c inform.c 
+clean:
+	rm -rf *.o
