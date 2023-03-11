@@ -20,11 +20,13 @@ typedef struct envParams {
   dArr *boxPoses;
   dArr *boxSizes;
 } envParams;
-
+unsigned char motion(XEvent *, winHandl *, dArr *);
 void createEnv(winHandl *, envParams *, char **);
 void inform(const char *, char);
-dArr parseBoxes(char **, envParams *newEnvParams);
+dArr parseBoxes(char **, envParams *, Display *);
 unsigned short uItos(unsigned int);
 void dispatch();
-unsigned char checkForOverlap(Window, Window, Display *dpy);
+unsigned char checkForOverlap(unsigned char, int, dArr, Display *, XEvent *);
+unsigned char savePointerAttachmentPositionifNotRoot(XEvent *, dArr *,
+                                                     winHandl *, unsigned char);
 #endif /*W21_H_*/
