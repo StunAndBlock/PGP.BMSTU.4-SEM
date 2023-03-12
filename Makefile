@@ -21,14 +21,17 @@ envW21Handler_C:
 INFORM_C:
 	cc -c $(PROJ)/inform.c -g
 
-W07: W07_C winW07Handler_C format
-	cc -o $(BUILD) W07.o winW07Handler.o -lX11 -g
+W07: W07_C winW07Handler_C numW07Handler_C format
+	cc -o $(BUILD) W07.o winW07Handler.o numW07Handler.o -lX11 -g
 W07_C:
 	cc -c $(PROJ)/W07.c -g
 
 winW07Handler_C: 
 	cc -c $(PROJ)/winW07Handler.c -g
 
+
+numW07Handler_C:
+	cc -c $(PROJ)/numW07Handler.c -g
 
 format:
 	clang-format -i $(PROJ)/*.c $(PROJ)/*.h
