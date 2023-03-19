@@ -10,6 +10,7 @@ typedef struct winHandl {
   Display *dpy;
   Window root;
   Window *boxes;
+  unsigned short *id;
   GC gc;
   XRectangle cell;
 } winHandl;
@@ -20,20 +21,20 @@ typedef struct dArr {
 
 typedef struct envParams {
   unsigned short boxCount;
-  dArr *boxPoses;
   char **reString;
 } envParams;
-unsigned char motion(XEvent *, winHandl *, dArr *);
+unsigned char motion(XEvent *, winHandl *, dArr *, unsigned short );
 void createEnv(winHandl *, envParams *);
 dArr parseBoxes(char **, envParams *, Display *);
 unsigned short uItos(unsigned int);
 void dispatch();
-unsigned char checkForOverlap(unsigned char, int, dArr, Display *, XEvent *,
-                              winHandl *newEnv, unsigned short count);
+unsigned char checkForOverlap(unsigned char, dArr, XEvent *, winHandl *,
+                              unsigned short , char *);
 unsigned char savePointerAttachmentPositionifNotRoot(XEvent *, dArr *,
-                                                     winHandl *, unsigned char,
+                                                     winHandl *,
                                                      unsigned short);
 void transformArgs(char *, envParams *);
 void freeEnv(winHandl *, envParams *);
 void fill(winHandl *, envParams *);
+void rewamp(winHandl *, envParams *);
 #endif /*W21_H_*/

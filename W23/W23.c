@@ -14,42 +14,58 @@ int main(unsigned short argc, char **argv) {
   winHandl newEnv;
   createEnv(&newEnv, &newEnvParams);
   dispatch(&newEnv, &newEnvParams);
+  freeEnv(&newEnv, &newEnvParams);
   XDestroySubwindows(newEnv.dpy, newEnv.root);
   XDestroyWindow(newEnv.dpy, newEnv.root);
   XCloseDisplay(newEnv.dpy);
-  freeEnv(&newEnv, &newEnvParams);
+
   return 0;
 }
 
 void dispatch(winHandl *newEnv, envParams *newEnvParams) {
   XEvent event;
   dArr truePos[2];
-  int lastVisibilityState = 0;
   unsigned char flag = 1; /* exit flag */
   char e = 1;
+  char status[newEnvParams->boxCount];
+  for (int i = 0; i < newEnvParams->boxCount; i++) {
+    status[i] = 0;
+  }
   while (flag) {
     XNextEvent(newEnv->dpy, &event);
     switch (event.type) {
     case VisibilityNotify:
-      lastVisibilityState = event.xvisibility.state;
-      // fprintf(stderr, "%d", event.xvisibility.state);
+      fill(newEnv, newEnvParams);
+      for (int i = 0; i < newEnvParams->boxCount; i++) {
+        if (newEnv->boxes[i] == event.xvisibility.window)
+          if (status[i]) {
+            status[i] = 0;
+          } else {
+            status[i] = 1;
+          }
+      }
       break;
     case ButtonRelease:
-      flag = checkForOverlap(flag, lastVisibilityState, truePos[1], newEnv->dpy,
-                             &event, newEnv, newEnvParams->boxCount);
+      flag = checkForOverlap(flag, truePos[1], &event, newEnv,
+                             newEnvParams->boxCount, status);
       break;
     case ButtonPress:
-      flag = savePointerAttachmentPositionifNotRoot(
-          &event, truePos, newEnv, lastVisibilityState, newEnvParams->boxCount);
+      flag = savePointerAttachmentPositionifNotRoot(&event, truePos, newEnv,
+                                                    newEnvParams->boxCount);
       break;
     case MotionNotify:
-      flag = motion(&event, newEnv, truePos);
+      flag = motion(&event, newEnv, truePos, newEnvParams->boxCount);
+
       break;
     case Expose:
       if (e) {
         fill(newEnv, newEnvParams);
         e--;
       }
+      break;
+      case KeyPress:
+      if(event.xkey.keycode==K_ESC)
+      rewamp(newEnv,newEnvParams);
       break;
     default:
       break;
