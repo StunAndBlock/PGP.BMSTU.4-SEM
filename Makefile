@@ -17,6 +17,18 @@ winW21Handler_C:
 envW21Handler_C:
 	cc -c $(PROJ)/envW21Handler.c -g
 
+W23: W23_C winW23Handler_C envW23Handler_C format
+	cc -o $(BUILD) W23.o winW23Handler.o envW23Handler.o -lX11 -g
+
+W23_C:
+	cc -c $(PROJ)/W23.c -g
+
+winW23Handler_C: 
+	cc -c $(PROJ)/winW23Handler.c -g
+envW23Handler_C:
+	cc -c $(PROJ)/envW23Handler.c -g
+
+
 
 INFORM_C:
 	cc -c $(PROJ)/inform.c -g
