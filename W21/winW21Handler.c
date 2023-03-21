@@ -6,7 +6,7 @@
 unsigned char checkForOverlap(unsigned char flag, int lastVisibilityState,
                               dArr pos, Display *dpy, XEvent *ev) {
   if (flag != 3) {
-    inform("MOTION DO NOT PERFORMED ->", 1);
+    inform("MOTION DID NOT PERFORM ->", 1);
 
   } else if (lastVisibilityState) {
     inform("MOTION PERFORMED INCORRECT ->", 1);
@@ -27,7 +27,8 @@ unsigned char motion(XEvent *ev, winHandl *newEnv, dArr *truePos) {
   XQueryPointer(newEnv->dpy, ev->xbutton.window, trashPointer, trashPointer,
                 &XY[ROOT][X], &XY[ROOT][Y], trashPointer, trashPointer,
                 trashPointer);
-  if (ev->xmotion.state & Button1Mask || ev->xmotion.state & Button2Mask || ev->xmotion.state & Button3Mask) {
+  if (ev->xmotion.state & Button1Mask || ev->xmotion.state & Button2Mask ||
+      ev->xmotion.state & Button3Mask) {
     XMoveWindow(newEnv->dpy, ev->xbutton.window,
                 XY[ROOT][X] + XY[TRUE_ROOT][X] - truePos[0].box[X],
                 XY[ROOT][Y] + XY[TRUE_ROOT][Y] - truePos[0].box[Y]);

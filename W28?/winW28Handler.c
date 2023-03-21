@@ -9,7 +9,7 @@ unsigned char checkForOverlap(unsigned char flag, int lastVisibilityState,
     inform("POINTER IS OUT OF ROOT BOUNDS ->RECOVER ->", 1);
 
   } else if (flag == 2) {
-    inform("MOTION DO NOT PERFORMED ->", 1);
+    inform("MOTION DID NOT PERFORM ->", 1);
 
   } else if (lastVisibilityState) {
     inform("MOTION PERFORMED INCORRECT ->", 1);
@@ -74,4 +74,3 @@ unsigned char savePointerAttachmentPositionifNotRoot(XEvent *ev, dArr *truePos,
   inform("POINTER ATTACHED ->", 1);
   return 2;
 }
-
