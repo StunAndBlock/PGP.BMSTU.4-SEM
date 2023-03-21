@@ -45,8 +45,29 @@ winW07Handler_C:
 numW07Handler_C:
 	cc -c $(PROJ)/numW07Handler.c -g
 
+
+W28: W28.o winW28Handler.o envW28Handler.o inform.o format
+	cc -o $(BUILD) W28.o winW28Handler.o envW28Handler.o inform.o -lX11 -g
+
+W28.o: $(PROJ)/W28.c
+	cc -c $(PROJ)/W28.c -g
+
+winW28Handler.o: $(PROJ)/winW28Handler.c
+	cc -c $(PROJ)/winW28Handler.c -g
+envW28Handler.o:$(PROJ)/envW28Handler.c 
+	cc -c $(PROJ)/envW28Handler.c -g
+
+inform.o: $(PROJ)/inform.c
+	cc -c $(PROJ)/inform.c -g
+
+
+
+
+#-------------------------------------------------------------------end
+
 format:
 	clang-format -i $(PROJ)/*.c $(PROJ)/*.h
+
 
 clean:
 	rm -rf $(BUILD) *.o
