@@ -1,15 +1,17 @@
+all:W21
+W21: W21_C winW21Handler_C INFORM_C envW21Handler_C 
+	cc -o W21 W21.o winW21Handler.o envW21Handler.o inform.o -lX11 
 
-all: xfloor format
+W21_C:
+	cc -c W21.c 
 
-xfloor: xfloor.c
-	cc -o build/xfloor xfloor.c -lX11 
+winW21Handler_C: 
+	cc -c winW21Handler.c 
+envW21Handler_C:
+	cc -c envW21Handler.c 
 
-format:
-	clang-format -i *.c
 
+INFORM_C:
+	cc -c inform.c 
 clean:
-	rm -rf build/*
-
-rebuild: clean all
-
-
+	rm -rf *.o
