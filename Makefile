@@ -57,13 +57,27 @@ winW28Handler.o: $(PROJ)/winW28Handler.c
 envW28Handler.o:$(PROJ)/envW28Handler.c 
 	cc -c $(PROJ)/envW28Handler.c -g
 
+
+
+
+24S: 24S.o win24SHandler.o env24SHandler.o inform.o format
+	cc -o $(BUILD) 24S.o win24SHandler.o env24SHandler.o inform.o -lX11 -g
+
+24S.o: $(PROJ)/24S.c
+	cc -c $(PROJ)/24S.c -g
+
+win24SHandler.o: $(PROJ)/win24SHandler.c
+	cc -c $(PROJ)/win24SHandler.c -g
+env24SHandler.o:$(PROJ)/env24SHandler.c 
+	cc -c $(PROJ)/env24SHandler.c -g
+
+#-------------------------------------------------------------------end
+
+
+
 inform.o: $(PROJ)/inform.c
 	cc -c $(PROJ)/inform.c -g
 
-
-
-
-#-------------------------------------------------------------------end
 
 format:
 	clang-format -i $(PROJ)/*.c $(PROJ)/*.h
