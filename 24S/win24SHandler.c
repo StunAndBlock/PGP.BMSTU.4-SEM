@@ -153,9 +153,13 @@ void drawTainted(tainted *taintedWins, winHandl *newEnv) {
         newEnv->rectangles[newEnv->rectanglesCount - 1].winBox) {
       XDrawRectangle(newEnv->dpy, taintedWins->winBox[i], newEnv->gc[2], 1, 1,
                      xwa.width - 2, xwa.height - 2);
+      XFillRectangle(newEnv->dpy, taintedWins->winBox[i], newEnv->gc[2], 1, 1,
+                     xwa.width - 2, xwa.height - 2);
     } else {
       XDrawRectangle(newEnv->dpy, taintedWins->winBox[i], newEnv->gc[1], 1, 1,
                      xwa.width - 2, xwa.height - 2);
+      XFillRectangle(newEnv->dpy, taintedWins->winBox[i], newEnv->gc[3], 2, 2,
+                     xwa.width - 4, xwa.height - 4);
     }
   }
 }

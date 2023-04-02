@@ -44,7 +44,8 @@ void createEnv(winHandl *newEnv) {
   XSetForeground(newEnv->dpy, newEnv->gc[1], BlackPixel(newEnv->dpy, scr));
   newEnv->gc[2] = XCreateGC(newEnv->dpy, newEnv->root, 0, 0);
   XSetForeground(newEnv->dpy, newEnv->gc[2], 0x8B00FF);
-  XSetBackground(newEnv->dpy, newEnv->gc[2], 0x8B00FF);
+  newEnv->gc[3] = XCreateGC(newEnv->dpy, newEnv->root, 0, 0);
+  XSetForeground(newEnv->dpy, newEnv->gc[3], WhitePixel(newEnv->dpy,scr));
   XSetLineAttributes(newEnv->dpy, newEnv->gc[0], 2, LineOnOffDash, CapNotLast,
                      JoinMiter);
   XSetLineAttributes(newEnv->dpy, newEnv->gc[1], 2, LineSolid, CapNotLast,
@@ -56,6 +57,7 @@ void createEnv(winHandl *newEnv) {
 void freeEnv(unsigned char state, winHandl *newEnv) {
   if (state)
     free(newEnv->rectangles);
+    XFreeGC(newEnv->dpy, newEnv->gc[3]);
   XFreeGC(newEnv->dpy, newEnv->gc[2]);
   XFreeGC(newEnv->dpy, newEnv->gc[1]);
 }

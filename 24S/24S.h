@@ -22,7 +22,7 @@ typedef struct winHandl {
   Window selection;
   env *rectangles;
   unsigned short rectanglesCount;
-  GC gc[3];
+  GC gc[4];
 
 } winHandl;
 

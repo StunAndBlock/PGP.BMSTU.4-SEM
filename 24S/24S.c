@@ -49,6 +49,8 @@ unsigned char dispatch(winHandl *newEnv) {
           XGetWindowAttributes(newEnv->dpy, newEnv->rectangles[i].winBox, &xwa);
           XDrawRectangle(newEnv->dpy, newEnv->rectangles[i].winBox,
                          newEnv->gc[1], 1, 1, xwa.width - 2, xwa.height - 2);
+          XFillRectangle(newEnv->dpy, newEnv->rectangles[i].winBox, newEnv->gc[3], 2, 2,
+          xwa.width - 4, xwa.height - 4);
         }
 
         XGetWindowAttributes(
@@ -57,6 +59,8 @@ unsigned char dispatch(winHandl *newEnv) {
         XDrawRectangle(newEnv->dpy,
                        newEnv->rectangles[newEnv->rectanglesCount - 1].winBox,
                        newEnv->gc[2], 1, 1, xwa.width - 2, xwa.height - 2);
+        XFillRectangle(newEnv->dpy, newEnv->rectangles[newEnv->rectanglesCount - 1].winBox, newEnv->gc[2], 2, 2,
+          xwa.width - 2, xwa.height - 2);
         for (int i = 0; i < newEnv->rectanglesCount; i++) {
           fprintf(stderr, "%d:{%lf} ", i, newEnv->rectangles[i].K);
         }
