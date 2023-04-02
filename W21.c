@@ -18,7 +18,6 @@ int main(unsigned short argc, char **argv) {
 void dispatch(winHandl *newEnv) {
   XEvent event;
   dArr truePos[2];
-
   int lastVisibilityState = 0;
   unsigned char flag = 1; /* exit flag */
   while (flag) {
@@ -33,8 +32,8 @@ void dispatch(winHandl *newEnv) {
               
      break;
     case ButtonPress:
-     flag = savePointerAttachmentPositionifNotRoot(&event, truePos, newEnv,
-                                                    lastVisibilityState);
+     flag = savePointerAttachmentPositionifNotRoot(&event, truePos, newEnv
+                                                   );
       break;
     case MotionNotify:
       flag = motion(&event, newEnv, truePos);

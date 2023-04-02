@@ -27,8 +27,17 @@ void createEnv(winHandl *newEnv, envParams *newEnvParams, char **args) {
   hint.x = 0;
   hint.y = 0;
   XSetNormalHints(newEnv->dpy, newEnv->root, &hint);
+
+  Pixmap pix = XCreatePixmap(newEnv->dpy, DefaultRootWindow(newEnv->dpy), 10, 10, depth);
+
+  XDrawRectangle(newEnv->dpy,pix,newEnv->gc[0],0,0,10,10);
+  attr.override_redirect = False;
+  attr.background_pixel = WhitePixel(newEnv->dpy, scr);
+  //attr.background_pixmap=pix;
+ // attr.bit_gravity=SouthEastGravity;
+  newEnv->selection=XCreateWindow(newEnv->dpy,newEnv->root,0,0,10,10,0,depth, InputOutput,
+  CopyFromParent, (CWOverrideRedirect| CWBackPixel), &attr);
   XMapWindow(newEnv->dpy, newEnv->root);
-  XMapSubwindows(newEnv->dpy, newEnv->root);
   newEnv->gc[1] = XCreateGC(newEnv->dpy, newEnv->root, 0, 0);
  // XCopyGC(newEnv->dpy, newEnv->gc[0], 0, newEnv->gc[1]);
   XSetForeground(newEnv->dpy, newEnv->gc[1],

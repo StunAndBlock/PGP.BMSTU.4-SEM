@@ -9,6 +9,7 @@ typedef struct winHandl {
   Display *dpy;
   Window root;
   Window *boxes;
+  Window selection;
   GC gc[3];
 } winHandl;
 
@@ -29,5 +30,5 @@ unsigned short uItos(unsigned int);
 void dispatch();
 unsigned char checkForOverlap(unsigned char, int, dArr*, winHandl *, XEvent *);
 unsigned char savePointerAttachmentPositionifNotRoot(XEvent *, dArr *,
-                                                     winHandl *, unsigned char);
+                                                     winHandl *);
 #endif /*W21_H_*/
