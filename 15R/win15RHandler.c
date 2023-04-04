@@ -5,7 +5,7 @@
 #define ROOT 1
 unsigned char checkForOverlap(unsigned char flag, int lastVisibilityState,
                               dArr *truePos, winHandl *newEnv) {
-  if ((lastVisibilityState==0 || lastVisibilityState==2)  && flag == 3) {
+  if ((lastVisibilityState == 0 || lastVisibilityState == 2) && flag == 3) {
     memoryAllocator(newEnv);
     XWindowAttributes xwa;
     XSetWindowAttributes attr;
@@ -13,7 +13,7 @@ unsigned char checkForOverlap(unsigned char flag, int lastVisibilityState,
     int depth = DefaultDepth(newEnv->dpy, scr);
     attr.override_redirect = False;
 
-    attr.background_pixmap=newEnv->pix;
+    attr.background_pixmap = newEnv->pix;
 
     attr.event_mask = (ButtonPressMask | ButtonReleaseMask |
                        VisibilityChangeMask | KeyPressMask);
@@ -149,10 +149,10 @@ void drawTainted(tainted *taintedWins, winHandl *newEnv) {
   for (unsigned short i = 0; i < taintedWins->taintedCount; i++) {
     XGetWindowAttributes(newEnv->dpy, taintedWins->winBox[i], &xwa);
 
-      XDrawRectangle(newEnv->dpy, taintedWins->winBox[i], newEnv->gc[1], 1, 1,
-                     xwa.width - 2, xwa.height - 2);
-     // XFillRectangle(newEnv->dpy, taintedWins->winBox[i], newEnv->gc[3], 2, 2,
-       //              xwa.width - 4, xwa.height - 4);
+    XDrawRectangle(newEnv->dpy, taintedWins->winBox[i], newEnv->gc[1], 1, 1,
+                   xwa.width - 2, xwa.height - 2);
+    // XFillRectangle(newEnv->dpy, taintedWins->winBox[i], newEnv->gc[3], 2, 2,
+    //              xwa.width - 4, xwa.height - 4);
   }
 }
 
@@ -168,7 +168,6 @@ unsigned char deleteBox(unsigned short pos, winHandl *newEnv) {
   XDestroyWindow(newEnv->dpy, newEnv->rectangles[pos].winBox);
   for (unsigned short i = pos; i < --(newEnv->rectanglesCount); i++) {
     newEnv->rectangles[i].winBox = newEnv->rectangles[i + 1].winBox;
-
   }
   env *stash = (env *)realloc(newEnv->rectangles,
                               sizeof(env) * (newEnv->rectanglesCount));
@@ -181,4 +180,3 @@ void swap(env *x, env *y) {
   *x = *y;
   *y = temp;
 }
-

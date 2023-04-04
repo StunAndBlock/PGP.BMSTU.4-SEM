@@ -70,6 +70,19 @@ win24SHandler.o: $(PROJ)/win24SHandler.c
 	cc -c $(PROJ)/win24SHandler.c -g
 env24SHandler.o:$(PROJ)/env24SHandler.c 
 	cc -c $(PROJ)/env24SHandler.c -g
+	
+15R: 15R.o win15RHandler.o env15RHandler.o inform.o format
+	cc -o $(BUILD) 15R.o win15RHandler.o env15RHandler.o inform.o -lX11 -g
+
+15R.o: $(PROJ)/15R.c
+	cc -c $(PROJ)/15R.c -g
+
+win15RHandler.o: $(PROJ)/win15RHandler.c
+	cc -c $(PROJ)/win15RHandler.c -g
+env15RHandler.o:$(PROJ)/env15RHandler.c 
+	cc -c $(PROJ)/env15RHandler.c -g	
+	
+	
 
 #-------------------------------------------------------------------end
 

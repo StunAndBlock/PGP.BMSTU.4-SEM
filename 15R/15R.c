@@ -50,7 +50,6 @@ unsigned char dispatch(winHandl *newEnv) {
           XDrawRectangle(newEnv->dpy, newEnv->rectangles[i].winBox,
                          newEnv->gc[1], 1, 1, xwa.width - 2, xwa.height - 2);
         }
-
       }
       break;
     case ButtonPress:

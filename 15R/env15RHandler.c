@@ -30,42 +30,41 @@ void createEnv(winHandl *newEnv) {
   hint.y = 0;
   XSetNormalHints(newEnv->dpy, newEnv->root, &hint);
 
-  
   attr.override_redirect = False;
   attr.background_pixel = WhitePixel(newEnv->dpy, scr);
   attr.event_mask = (VisibilityChangeMask | KeyPressMask);
   newEnv->selection = XCreateWindow(
       newEnv->dpy, newEnv->root, 0, 0, 10, 10, 0, depth, InputOutput,
-      CopyFromParent, (CWOverrideRedirect | CWBackPixel | CWEventMask ), &attr);
+      CopyFromParent, (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
   XMapWindow(newEnv->dpy, newEnv->root);
-  
+
   newEnv->gc[2] = XCreateGC(newEnv->dpy, newEnv->root, 0, 0);
   XSetForeground(newEnv->dpy, newEnv->gc[2], 0x8B00FF);
-    newEnv->gc[1] = XCreateGC(newEnv->dpy, newEnv->root, 0, 0);
+  newEnv->gc[1] = XCreateGC(newEnv->dpy, newEnv->root, 0, 0);
 
   XSetForeground(newEnv->dpy, newEnv->gc[1], BlackPixel(newEnv->dpy, scr));
   XSetBackground(newEnv->dpy, newEnv->gc[1], BlackPixel(newEnv->dpy, scr));
-    XSetLineAttributes(newEnv->dpy, newEnv->gc[1], 2, LineSolid, CapProjecting,
+  XSetLineAttributes(newEnv->dpy, newEnv->gc[1], 2, LineSolid, CapProjecting,
                      JoinMiter);
   newEnv->gc[3] = XCreateGC(newEnv->dpy, newEnv->root, 0, 0);
-  XSetForeground(newEnv->dpy, newEnv->gc[3], WhitePixel(newEnv->dpy,scr));
+  XSetForeground(newEnv->dpy, newEnv->gc[3], WhitePixel(newEnv->dpy, scr));
   XSetLineAttributes(newEnv->dpy, newEnv->gc[0], 2, LineOnOffDash, CapNotLast,
                      JoinMiter);
 
   XSetLineAttributes(newEnv->dpy, newEnv->gc[2], 2, LineSolid, CapNotLast,
                      JoinMiter);
-    newEnv->pix=XCreatePixmap(newEnv->dpy,newEnv->root,100,100, depth);
-    
-    XFillRectangle(newEnv->dpy,newEnv->pix,newEnv->gc[3],0,0,100,100);
-    XDrawPoint(newEnv->dpy,newEnv->pix,newEnv->gc[1],0,99);
-    XDrawPoint(newEnv->dpy,newEnv->pix,newEnv->gc[1],99,0);
-    XDrawLine(newEnv->dpy,newEnv->pix,newEnv->gc[1],0,0,100,100);
+  newEnv->pix = XCreatePixmap(newEnv->dpy, newEnv->root, 100, 100, depth);
+
+  XFillRectangle(newEnv->dpy, newEnv->pix, newEnv->gc[3], 0, 0, 100, 100);
+  XDrawPoint(newEnv->dpy, newEnv->pix, newEnv->gc[1], 0, 99);
+  XDrawPoint(newEnv->dpy, newEnv->pix, newEnv->gc[1], 99, 0);
+  XDrawLine(newEnv->dpy, newEnv->pix, newEnv->gc[1], 0, 0, 100, 100);
 }
 
 void freeEnv(unsigned char state, winHandl *newEnv) {
   if (state)
     free(newEnv->rectangles);
-    XFreeGC(newEnv->dpy, newEnv->gc[3]);
+  XFreeGC(newEnv->dpy, newEnv->gc[3]);
   XFreeGC(newEnv->dpy, newEnv->gc[2]);
   XFreeGC(newEnv->dpy, newEnv->gc[1]);
 }
