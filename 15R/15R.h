@@ -15,20 +15,23 @@ typedef struct tainted {
   Window *winBox;
 } tainted;
 
+typedef struct dArr {
+  short box[2];
+} dArr;
+
 typedef struct winHandl {
   Display *dpy;
   Window root;
   Window selection;
   Pixmap pix;
+  dArr rtwn;
   env *rectangles;
   unsigned short rectanglesCount;
   GC gc[4];
 
 } winHandl;
 
-typedef struct dArr {
-  short box[2];
-} dArr;
+
 
 unsigned char motion(XEvent *, winHandl *, dArr *);
 void createEnv(winHandl *);

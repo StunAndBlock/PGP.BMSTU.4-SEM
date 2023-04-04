@@ -46,7 +46,7 @@ unsigned char motion(XEvent *ev, winHandl *newEnv, dArr *truePos) {
     XQueryPointer(newEnv->dpy, ev->xbutton.window, trashPointer, trashPointer,
                   &XY[ROOT][X], &XY[ROOT][Y], trashPointer, trashPointer,
                   trashPointer);
-
+  if(XY[TRUE_ROOT][X] + XY[ROOT][X]>0 && XY[TRUE_ROOT][X] + XY[ROOT][X]<newEnv->rtwn.box[X] && XY[TRUE_ROOT][Y] + XY[ROOT][Y]>0 && XY[TRUE_ROOT][Y] + XY[ROOT][Y]<newEnv->rtwn.box[Y]){
     if (XY[TRUE_ROOT][X] + XY[ROOT][X] - truePos[0].box[X] > 0 &&
         XY[TRUE_ROOT][Y] + XY[ROOT][Y] - truePos[0].box[Y] < 0) {
       // XDrawRectangle(newEnv->dpy,newEnv->root,newEnv->gc[1],truePos[0].box[X],truePos[1].box[Y],truePos[1].box[X]-truePos[0].box[X],truePos[0].box[Y]-truePos[1].box[Y]);
@@ -92,6 +92,7 @@ unsigned char motion(XEvent *ev, winHandl *newEnv, dArr *truePos) {
 
     XMapWindow(newEnv->dpy, newEnv->selection);
     XRaiseWindow(newEnv->dpy, newEnv->selection);
+  }
     free(trashPointer);
     truePos[1].box[X] = XY[TRUE_ROOT][X] + XY[ROOT][X];
     truePos[1].box[Y] = XY[TRUE_ROOT][Y] + XY[ROOT][Y];

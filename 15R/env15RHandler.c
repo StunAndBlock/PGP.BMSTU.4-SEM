@@ -12,6 +12,8 @@ void createEnv(winHandl *newEnv) {
   rootWindowSize.box[X] = DisplayWidth(newEnv->dpy, scr);
   rootWindowSize.box[Y] = DisplayHeight(newEnv->dpy, scr);
   newEnv->gc[0] = DefaultGC(newEnv->dpy, scr);
+  newEnv->rtwn.box[X]= rootWindowSize.box[X]-300;
+  newEnv->rtwn.box[Y]= rootWindowSize.box[Y]-300;
   XSetWindowAttributes attr; /* created Window attributes */
   XSizeHints hint;
   attr.override_redirect = False;

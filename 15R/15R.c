@@ -71,5 +71,6 @@ unsigned char dispatch(winHandl *newEnv) {
       break;
     } /* switch */
   }   /* while */
+  free(rectangles.winBox);
   return state;
 } /* dispatch */
