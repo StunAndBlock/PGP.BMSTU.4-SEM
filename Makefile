@@ -1,7 +1,7 @@
 all:8S
 
 8S: 8S.o win8SH.o env8SH.o
-	cc -o 8S 8S.o win8SH.o env8SH.o  -lX11 
+	cc -o build/8S 8S.o win8SH.o env8SH.o  -lX11 
 
 8S.o: 8S.c
 	cc -c 8S.c 
