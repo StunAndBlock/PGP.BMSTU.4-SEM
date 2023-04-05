@@ -1,17 +1,16 @@
-all:W21
-W21: W21_C winW21Handler_C INFORM_C envW21Handler_C 
-	cc -o W21 W21.o winW21Handler.o envW21Handler.o inform.o -lX11 
+all:8S
 
-W21_C:
-	cc -c W21.c 
+8S: 8S.o win8SH.o env8SH.o
+	cc -o 8S 8S.o win8SH.o env8SH.o  -lX11 
 
-winW21Handler_C: 
-	cc -c winW21Handler.c 
-envW21Handler_C:
-	cc -c envW21Handler.c 
+8S.o: 8S.c
+	cc -c 8S.c 
 
+win8SH.o: win8SH.c
+	cc -c win8SH.c 
+env8SH.o:env8SH.c 
+	cc -c env8SH.c 
 
-INFORM_C:
-	cc -c inform.c 
 clean:
-	rm -rf *.o
+	rm -rf *.o 8S
+rebuild: clean 8S
