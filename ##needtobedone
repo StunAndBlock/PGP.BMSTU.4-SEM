@@ -1,0 +1,31 @@
+if using Window-belonging type of region members
+
+func of creating and deleting regions:
+principle will be to create custom struct named "region" members of which will be dinamic unsgigned short typed array containing global indexes of windows;
+
+###-----------------
+struct region{
+unsigned short* members;
+} 
+
+###-----------------
+creating new not covering any other boxed window will create new region with one 'head'
+members[0]=the last global index of created window
+and then creating new covering window will call new function to find index of covered window, then find it in all regions through its members
+
+
+alter: save windows instantly in regions;
+###-----------------
+struct region{
+Window* members;
+} 
+###-----------------
+
+delete region will simply find window, our pointer pointing at, in all regions, returning something like index of region and then just deleting all its members;
+-----------------------------------------------------------------------------------###
+add color parser
+just translate string, contains of hex code, into unsigned int , maybe atoi can perform such an operation
+
+example: ./main OxFFFFFF
+int color = atoi(argv[1]); ???
+attr.background_pixel=color;      
