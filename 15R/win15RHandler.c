@@ -32,6 +32,8 @@ unsigned char checkForOverlap(unsigned char flag, int lastVisibilityState,
 
     XUnmapWindow(newEnv->dpy, newEnv->selection);
   }
+  XClearWindow(newEnv->dpy,newEnv->root);
+  XUngrabPointer(newEnv->dpy,CurrentTime);
   return 1;
 }
 
@@ -46,7 +48,7 @@ unsigned char motion(XEvent *ev, winHandl *newEnv, dArr *truePos) {
     XQueryPointer(newEnv->dpy, ev->xbutton.window, trashPointer, trashPointer,
                   &XY[ROOT][X], &XY[ROOT][Y], trashPointer, trashPointer,
                   trashPointer);
-  if(XY[TRUE_ROOT][X] + XY[ROOT][X]>0 && XY[TRUE_ROOT][X] + XY[ROOT][X]<newEnv->rtwn.box[X] && XY[TRUE_ROOT][Y] + XY[ROOT][Y]>0 && XY[TRUE_ROOT][Y] + XY[ROOT][Y]<newEnv->rtwn.box[Y]){
+  
     if (XY[TRUE_ROOT][X] + XY[ROOT][X] - truePos[0].box[X] > 0 &&
         XY[TRUE_ROOT][Y] + XY[ROOT][Y] - truePos[0].box[Y] < 0) {
       // XDrawRectangle(newEnv->dpy,newEnv->root,newEnv->gc[1],truePos[0].box[X],truePos[1].box[Y],truePos[1].box[X]-truePos[0].box[X],truePos[0].box[Y]-truePos[1].box[Y]);
@@ -92,7 +94,7 @@ unsigned char motion(XEvent *ev, winHandl *newEnv, dArr *truePos) {
 
     XMapWindow(newEnv->dpy, newEnv->selection);
     XRaiseWindow(newEnv->dpy, newEnv->selection);
-  }
+  
     free(trashPointer);
     truePos[1].box[X] = XY[TRUE_ROOT][X] + XY[ROOT][X];
     truePos[1].box[Y] = XY[TRUE_ROOT][Y] + XY[ROOT][Y];
@@ -103,7 +105,7 @@ unsigned char motion(XEvent *ev, winHandl *newEnv, dArr *truePos) {
 
 unsigned char savePointerAttachmentPositionifNotRoot(XEvent *ev, dArr *truePos,
                                                      winHandl *newEnv) {
-
+          
   if (ev->xbutton.window == newEnv->root) {
     truePos[0].box[X] = ev->xbutton.x;
     truePos[0].box[Y] = ev->xbutton.y;
@@ -111,6 +113,7 @@ unsigned char savePointerAttachmentPositionifNotRoot(XEvent *ev, dArr *truePos,
     truePos[1].box[X] = truePos[0].box[X];
     truePos[1].box[Y] = truePos[0].box[Y];
     // fprintf(stderr,"{%d %d}\n",truePos[0].box[X],truePos[0].box[Y]);
+    XGrabPointer(newEnv->dpy,newEnv->root,False,(ButtonReleaseMask | Button1MotionMask),GrabModeAsync, GrabModeAsync,newEnv->root,None,CurrentTime);
     return 2;
   }
   return 1;
