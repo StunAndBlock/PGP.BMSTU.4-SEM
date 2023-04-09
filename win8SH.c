@@ -2,10 +2,16 @@
 #include "stdio.h"
 #define TRUE_ROOT 0
 #define ROOT 1
-unsigned char mapNewBox(unsigned char flag,
-                        dArr *truePos, winHandl *newEnv) {
+unsigned char manageRegion(unsigned char flag,
+                        dArr *truePos, winHandl *newEnv,unsigned char taintedCount) {
   if ( flag == 3) {
-    memoryAllocator(newEnv);
+    if(taintedCount){
+    Region* stash=(Region*)realloc(sizeof(Region)*(++newEnv->regs->winCount));
+    } else{
+    newEnv->regs=(Region*)malloc(sizeof(Region));
+    newEnv->regs->winCount++;
+    newEnv->regs->connections=NULL;
+    }
     XWindowAttributes xwa;
     XSetWindowAttributes attr;
     int scr = DefaultScreen(newEnv->dpy);
@@ -16,10 +22,8 @@ unsigned char mapNewBox(unsigned char flag,
     attr.event_mask = (ButtonPressMask | ButtonReleaseMask | KeyPressMask);
 
     XGetWindowAttributes(newEnv->dpy, newEnv->selection, &xwa);
-    newEnv->rectangles[(newEnv->rectanglesCount) - 1].K =
-        xwa.width + xwa.height;
 
-    newEnv->rectangles[newEnv->rectanglesCount - 1].winBox =
+    newEnv->regs[].win =
         XCreateWindow(newEnv->dpy, newEnv->root, xwa.x, xwa.y, xwa.width,
                       xwa.height, 0, depth, InputOutput, CopyFromParent,
                       (CWOverrideRedirect | CWBackPixel| CWEventMask), &attr);
@@ -133,15 +137,56 @@ unsigned short findBox(Window winToDel, winHandl *newEnv) {
   }
   return 0;
 }
-unsigned char deleteBox(unsigned short pos, winHandl *newEnv) {
-  XUnmapWindow(newEnv->dpy, newEnv->rectangles[pos].winBox);
-  XDestroyWindow(newEnv->dpy, newEnv->rectangles[pos].winBox);
+unsigned char deleteRegion(unsigned short pos, Window *newEnv) {
   for (unsigned short i = pos; i < --(newEnv->rectanglesCount); i++) {
     newEnv->rectangles[i].winBox = newEnv->rectangles[i + 1].winBox;
-    newEnv->rectangles[i].K = newEnv->rectangles[i + 1].K;
+
   }
-  env *stash = (env *)realloc(newEnv->rectangles,
+  Window *stash = (Window *)realloc(newEnv->rectangles,
                               sizeof(env) * (newEnv->rectanglesCount));
   newEnv->rectangles = stash;
   return 4;
+}
+
+void taintedCorrect(XEvent* ev,Window* tainted,unsigned char *taintedCount){
+if (*taintedCount){
+  tainted=(Window*)malloc(sizeof(Window));
+  (*taintedCount)++;
+  tainted[0]=ev->xvisibility.window;
+} else {
+      int pos=findWin(ev->xvisibility.window,tainted,*taintedCount);
+      if(pos!=-1){
+      for (unsigned short i=pos ; i < --(*taintedCount); i++) {
+    tainted[i] = tainted[i+1];
+      }
+    Window *stash = (Window *)realloc(tainted,
+                              sizeof(Window) * (*taintedCount));
+    if (stash == NULL) {
+    fprintf(stderr, "MEMORY ERROR, informed by <taintedCorrect> function");
+    exit(-1);
+  }
+    tainted= stash;
+      } else {
+          Window *stash = (Window *)realloc(tainted,
+                              sizeof(Window) * (++(*taintedCount)));
+    if (stash == NULL) {
+    fprintf(stderr, "MEMORY ERROR, informed by <taintedCorrect> function");
+    exit(-1);
+      }
+      tainted= stash;
+      tainted[taintedCount-1]=ev->xvisibility.window;
+  }
+}
+if (!(*taintedCount)){
+free(taintedCount);
+}
+}
+
+
+int findWin(Window aim,Window* tainted,unsigned short taintedCount){
+for (int i = 0; i < taintedCount; i++) {
+    if (aim==tainted[i])
+    return i; 
+}
+return -1;
 }

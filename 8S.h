@@ -7,18 +7,19 @@
 #define Y 1
 #define K_ESC 9
 
-typedef struct environment {
-  Window winBox;
-  unsigned int K;
-} env;
+typedef struct region {
+  Window* wins;
+  unsigned short winCount;
+  unsigned short* connections;
+} Region;
 
 
 typedef struct winHandl {
   Display *dpy;
   Window root;
   Window selection;
-  env *rectangles;
-  unsigned short rectanglesCount;
+  Region *regs;
+  unsigned short regsCount;
   GC gc[2];
 
 } winHandl;
@@ -31,11 +32,11 @@ unsigned char motion(XEvent *, winHandl *, dArr *);
 void createEnv(winHandl *);
 void inform(const char *, char);
 unsigned char dispatch(winHandl *);
-unsigned char mapNewBox(unsigned char, dArr *, winHandl *);
+unsigned char manageRegion(unsigned char, dArr *, winHandl *,unsigned char);
 unsigned char savePAP(XEvent *, dArr *, winHandl *);
 void memoryAllocator(winHandl *);
-unsigned char deleteBox(unsigned short, winHandl *);
-unsigned short findBox(Window, winHandl *);
-void sortBoxes(env *, int, int);
+unsigned char deleteRegion(unsigned short, winHandl *);
+int findWin(Window aim,Window* tainted,unsigned short);
 void freeEnv(unsigned char, winHandl *);
+void taintedCorrect(XEvent* ,Window* ,unsigned char*);
 #endif /*W21_H_*/

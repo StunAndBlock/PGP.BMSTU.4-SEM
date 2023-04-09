@@ -16,16 +16,20 @@ int main(void) {
 unsigned char dispatch(winHandl *newEnv) {
   XEvent event;
   dArr truePos[2];
+  Window* tainted;
+  unsigned char taintedCount=0;
   int lastVisibilityState = 0;
   unsigned char flag = 1; /* exit flag */
   unsigned char state = 0;
   while (flag) {
     XNextEvent(newEnv->dpy, &event);
     switch (event.type) {
-  
+    case VisibilityNotify:
+    taintedCorrect(tainted,&taintedCount);
     case ButtonRelease:
-      if (event.xbutton.button == 1) {
-        state = mapNewBox(flag, truePos, newEnv);
+      if (event.xbutton.button == 1 ) {
+        if (taintedCount){
+        state = addToRegion(flag, truePos, newEnv);
       }
       break;
     case ButtonPress:
@@ -33,7 +37,7 @@ unsigned char dispatch(winHandl *newEnv) {
         flag = savePAP(&event, truePos, newEnv);
       } else if (event.xbutton.button == 3 &&
                  event.xbutton.window != newEnv->root) {
-        flag = deleteBox(findBox(event.xbutton.window, newEnv), newEnv);
+        flag = deleteRegin();
       }
       break;
     case MotionNotify:
