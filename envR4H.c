@@ -48,5 +48,33 @@ void createEnv(winHandl *newEnv) {
 void freeEnv(unsigned char state, winHandl *newEnv) {
   if (state)
     free(newEnv->rectangles);
+}
+
+void parseColor(winHandl* newEnv,int argc,char** argv){
+    Colormap cmap;                
+	XColor rgb, exact;
+  XrmDatabase rbd;         
+	int i;                      
+	static XrmOptionDescRec rtab[] = 
+	{ 
+		{"-bg ", ".background", XrmoptionSepArg, NULL}
+		{"-xrm ", NULL, XrmoptionResArg, NULL}
+	}; 
+  XrmInitialize();                         
+	rdb = XrmGetFileDatabase(".xdb");                     
+	XrmParseCommand(&rdb, rtab, 2+1, "r4", &argc, argv); 
+for(i=0; i < NGC; i++) 
+	{
+		if(XrmGetResource(rdb, rname[i], NULL, &rtype, rval) == False)
+			rval->addr = rdef[i];
+		if(XParseColor(dpy, cmap, rval->addr, &rgb) == 0)
+			if(XLookupColor(dpy, cmap, (rval->addr = rdef[i]), &rgb, &exact) == 0)
+				memcpy(&rgb, &exact, sizeof(XColor));
+		printf("%s(%s): %s\n", rname[i], rtab[i].option, rval->addr); /* Echo */
+		fflush(stdout);
+		XAllocColor(dpy, cmap, &rgb);
+		gc[i] = XCreateGC(dpy, root, 0, 0);
+		XSetForeground(dpy, gc[i], rgb.pixel);
+	} 
 
 }

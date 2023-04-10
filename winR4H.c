@@ -12,7 +12,7 @@ unsigned char mapNewBox(unsigned char flag, int lastVisibilityState,
     int depth = DefaultDepth(newEnv->dpy, scr);
 
     attr.override_redirect = False;
-    attr.background_pixel = 0XABCDEF;
+    attr.background_pixel = newEnv->color;
     attr.event_mask = (ButtonPressMask | ButtonReleaseMask |
                         KeyPressMask | VisibilityChangeMask);
 

@@ -22,8 +22,8 @@ typedef struct winHandl {
   Window selection;
   env *rectangles;
   unsigned short rectanglesCount;
+  unsigned long color;
   GC gc;
-
 } winHandl;
 
 typedef struct dArr {
@@ -43,4 +43,5 @@ unsigned char deleteBox(unsigned short, winHandl *);
 int findBox(Window, winHandl *);
 void sortBoxes(env *, int, int);
 void freeEnv(unsigned char, winHandl *);
+void parseColor(winHandl* newEnv,int argc,char** argv);
 #endif /*R4_H_*/
