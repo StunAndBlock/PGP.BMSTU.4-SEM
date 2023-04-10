@@ -3,7 +3,7 @@
 
 void createEnv(winHandl *newEnv) {
   newEnv->dpy = XOpenDisplay(NULL);
-  newEnv->rectanglesCount = 0;
+  newEnv->regsCount = 0;
   int scr = DefaultScreen(newEnv->dpy);
   int depth = DefaultDepth(newEnv->dpy, scr);
   dArr rootWindowSize;
@@ -46,6 +46,6 @@ void createEnv(winHandl *newEnv) {
 
 void freeEnv(unsigned char state, winHandl *newEnv) {
   if (state)
-    free(newEnv->rectangles);
+
   XFreeGC(newEnv->dpy, newEnv->gc[1]);
 }

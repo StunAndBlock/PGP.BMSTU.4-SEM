@@ -11,14 +11,13 @@ typedef struct region {
   Window* wins;
   unsigned short winCount;
   unsigned short* connections;
-} Region;
-
+} _Region;
 
 typedef struct winHandl {
   Display *dpy;
   Window root;
   Window selection;
-  Region *regs;
+  _Region *regs;
   unsigned short regsCount;
   GC gc[2];
 
@@ -30,13 +29,15 @@ typedef struct dArr {
 
 unsigned char motion(XEvent *, winHandl *, dArr *);
 void createEnv(winHandl *);
-void inform(const char *, char);
 unsigned char dispatch(winHandl *);
-unsigned char manageRegion(unsigned char, dArr *, winHandl *,unsigned char);
+unsigned char addToRegion(unsigned char, dArr *, winHandl *,int);
 unsigned char savePAP(XEvent *, dArr *, winHandl *);
-void memoryAllocator(winHandl *);
-unsigned char deleteRegion(unsigned short, winHandl *);
-int findWin(Window aim,Window* tainted,unsigned short);
+void memoryAllocator(winHandl *newEnv,int);
+int findWin(Window aim,Window** tainted,unsigned short);
 void freeEnv(unsigned char, winHandl *);
-void taintedCorrect(XEvent* ,Window* ,unsigned char*);
+void taintedCorrect(Window currWin,int,Window** tainted,unsigned short *taintedCount);
+void createRegion(winHandl *newEnv);
+unsigned char deleteRegion();
+int findRegion(Window* tainted,unsigned short taintedCount,winHandl* newEnv);
+int addRegion(winHandl *newEnv);
 #endif /*W21_H_*/
