@@ -16,7 +16,7 @@ unsigned char addToRegion(unsigned char flag,
     attr.event_mask = (ButtonPressMask | ButtonReleaseMask | KeyPressMask|VisibilityChangeMask);
 
     XGetWindowAttributes(newEnv->dpy, newEnv->selection, &xwa);
-
+    
     newEnv->regs[regionNumber].wins[newEnv->regs[regionNumber].winCount-1] =
         XCreateWindow(newEnv->dpy, newEnv->root, xwa.x, xwa.y, xwa.width,
                       xwa.height, 0, depth, InputOutput, CopyFromParent,
@@ -109,7 +109,8 @@ unsigned char savePAP(XEvent *ev, dArr *truePos, winHandl *newEnv) {
 
 void memoryAllocator(winHandl* newEnv,int RegN) {
   if(newEnv->regs[RegN].winCount){
-      Window* stash=(Window*)realloc(newEnv->regs[RegN].wins,++(newEnv->regs[RegN].winCount));
+      
+      Window* stash=(Window*)realloc(newEnv->regs[RegN].wins,++(newEnv->regs[RegN].winCount)*sizeof(Window));
       if(stash==NULL){
         exit(-1);
       }
@@ -118,58 +119,63 @@ void memoryAllocator(winHandl* newEnv,int RegN) {
       newEnv->regs[RegN].wins=(Window*)malloc(sizeof(Window)*(++(newEnv->regs[RegN].winCount)));
       
     }
-    fprintf(stderr,"WINCOUNT:::%d)",newEnv->regs[RegN].winCount);
+   // fprintf(stderr,"WINCOUNT:::%d)",newEnv->regs[RegN].winCount);
 }
 
 
 
-void taintedCorrect(Window curWin,int state,Window** tainted,unsigned short *taintedCount){
-if (!(*taintedCount)){
-  *tainted=(Window*)malloc(sizeof(Window));
-  (*taintedCount)++;
-  *tainted[0]=curWin;
- // fprintf(stderr,"DELETED\n");
+void taintedCorrect(Window curWin,int state,winHandl* newEnv){
+fprintf(stderr,"\tWIN:%ld ",curWin);
+if (!newEnv->taintedCount){
+  newEnv->tainted=(Window*)malloc(sizeof(Window));
+  newEnv->taintedCount++;
+  newEnv->tainted[0]=curWin;
+ 
 } else {
-      int pos=findWin(curWin,tainted,*taintedCount);
-     fprintf(stderr,"FOUND:<%d>\n",pos);
-      if(pos!=-1 && !state){
-      for (unsigned short i=pos ; i < --(*taintedCount); i++) {
-    *tainted[i] = *tainted[i+1];
+      int pos=findWin(curWin,newEnv->tainted,newEnv->taintedCount);
+    fprintf(stderr,"POS:::%d ",pos);
+      if(pos!=-1 && state!=2){
+      for (unsigned short i=pos ; i < --(newEnv->taintedCount); i++) {
+    newEnv->tainted[i] = newEnv->tainted[i+1];
       }
-  if (!(*taintedCount)){
-    free(*tainted);
-    return;
+  if (!(newEnv->taintedCount)){
+    free(newEnv->tainted);
   }
 
       } else if (pos){
-          Window *stash = (Window *)realloc(*tainted,
-                              sizeof(Window) * (++(*taintedCount)));
+        //fprintf(stderr,"aaaaaaaaaaaaaaaaaaaaaa\n\n\n\n\n");
+          Window *stash = (Window *)realloc(newEnv->tainted,
+                              sizeof(Window) * (++(newEnv->taintedCount)));
     if (stash == NULL) {
     fprintf(stderr, "MEMORY ERROR, informed by <taintedCorrect> function");
     exit(-1);
       }
-      *tainted= stash;
-      *tainted[(*taintedCount)-1]=curWin;
+      newEnv->tainted= stash;
+      newEnv->tainted[(newEnv->taintedCount)-1]=curWin;
   }
 
 }
+fprintf(stderr,"TAINTEDCOUNT:%d\n",newEnv->taintedCount);
+for (int i=0;i<newEnv->taintedCount;i++){
+  fprintf(stderr,"TW:%ld\n",newEnv->tainted[i]);
+}
 }
 
 
-int findWin(Window aim,Window** tainted,unsigned short taintedCount){
+int findWin(Window aim,Window* tainted,unsigned short taintedCount){
 for (int i = 0; i < taintedCount; i++) {
-    if (aim==*tainted[i])
+    if (aim==tainted[i])
     return i; 
 }
 return -1;
 }
-int findRegion(Window* tainted,unsigned short taintedCount,winHandl* newEnv){
+int findRegion(winHandl* newEnv){
   int c[newEnv->regsCount];
   unsigned short f=0;
-  for(unsigned short i=0;i<taintedCount;i++){
+  for(unsigned short i=0;i<newEnv->taintedCount;i++){
       for(unsigned short j=0;j<newEnv->regsCount;j++){
         for(unsigned short k=0;k<newEnv->regs[j].winCount;k++){
-            if(tainted[i]==newEnv->regs[j].wins[k])
+            if(newEnv->tainted[i]==newEnv->regs[j].wins[k])
             c[f++]=j;
         }
       }
@@ -183,17 +189,21 @@ void createRegion(winHandl *newEnv){
     newEnv->regs=(_Region*)malloc(sizeof(_Region));
     newEnv->regs[newEnv->regsCount].winCount=0;
     newEnv->regs[(newEnv->regsCount)++].connections=NULL;
+    newEnv->regs[(newEnv->regsCount)-1].head=1;
 }
 
 int addRegion(winHandl *newEnv){
-  _Region* stash=( _Region*)realloc(newEnv->regs,++(newEnv->regsCount));
+  newEnv->regsCount++;
+  _Region* stash=( _Region*)realloc(newEnv->regs,(newEnv->regsCount)*sizeof(_Region));
   if (stash==NULL){
      fprintf(stderr, "MEMORY ERROR, informed by <addRegion> function");
     exit(-1);
   }
   newEnv->regs=stash;
-  newEnv->regs[(newEnv->regsCount)-1].winCount=0;
-  newEnv->regs[(newEnv->regsCount)-1].connections=NULL;
+  newEnv->regs[newEnv->regsCount-1].winCount=0;
+  newEnv->regs[newEnv->regsCount-1].connections=NULL;
+  newEnv->regs[newEnv->regsCount-1].head=1;
+  return newEnv->regsCount-1;
 }
 
 unsigned char deleteRegion(){

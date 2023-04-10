@@ -11,6 +11,7 @@ typedef struct region {
   Window* wins;
   unsigned short winCount;
   unsigned short* connections;
+  int head;
 } _Region;
 
 typedef struct winHandl {
@@ -19,6 +20,8 @@ typedef struct winHandl {
   Window selection;
   _Region *regs;
   unsigned short regsCount;
+  Window* tainted;
+  unsigned short taintedCount;
   GC gc[2];
 
 } winHandl;
@@ -33,11 +36,11 @@ unsigned char dispatch(winHandl *);
 unsigned char addToRegion(unsigned char, dArr *, winHandl *,int);
 unsigned char savePAP(XEvent *, dArr *, winHandl *);
 void memoryAllocator(winHandl *newEnv,int);
-int findWin(Window aim,Window** tainted,unsigned short);
+int findWin(Window aim,Window* tainted,unsigned short);
 void freeEnv(unsigned char, winHandl *);
-void taintedCorrect(Window currWin,int,Window** tainted,unsigned short *taintedCount);
+void taintedCorrect(Window currWin,int,winHandl*);
 void createRegion(winHandl *newEnv);
 unsigned char deleteRegion();
-int findRegion(Window* tainted,unsigned short taintedCount,winHandl* newEnv);
+int findRegion(winHandl* newEnv);
 int addRegion(winHandl *newEnv);
 #endif /*W21_H_*/

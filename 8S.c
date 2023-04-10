@@ -16,8 +16,8 @@ int main(void) {
 unsigned char dispatch(winHandl *newEnv) {
   XEvent event;
   dArr truePos[2];
-  Window* tainted;
-  unsigned short taintedCount=0;
+  int ee=1;
+  newEnv->taintedCount=0;
   int lastVisibilityState = 0;
   unsigned char flag = 1; /* exit flag */
   unsigned char state = 0;
@@ -26,8 +26,11 @@ unsigned char dispatch(winHandl *newEnv) {
     XNextEvent(newEnv->dpy, &event);
     switch (event.type) {
     case VisibilityNotify:
-    taintedCorrect(event.xvisibility.window,event.xvisibility.state,&tainted,&taintedCount);
-    fprintf(stderr,"\t\t\t<%d>'\n\n",event.xvisibility.state);
+   
+    taintedCorrect(event.xvisibility.window,event.xvisibility.state,newEnv);
+    //fprintf(stderr,"\t\t\tV<%d>'\n\n",event.xvisibility.state);
+    
+    newEnv->regs[regionNumber].head++;
     break;
     case ButtonRelease:
 
@@ -36,18 +39,19 @@ unsigned char dispatch(winHandl *newEnv) {
           createRegion(newEnv);
          
         } else {
-                if(!taintedCount){
+                if(!newEnv->taintedCount){
           regionNumber=addRegion(newEnv);
     
         } else {
-          regionNumber=findRegion(tainted,taintedCount,newEnv);
+          regionNumber=findRegion(newEnv);
         }
         }
-
+       
         state = addToRegion(flag, truePos, newEnv,regionNumber);
-        if(newEnv->regs[regionNumber].winCount>1)
-        taintedCorrect(newEnv->regs[regionNumber].wins[newEnv->regs[regionNumber].winCount-2],0,&tainted,&taintedCount);
-        taintedCorrect(newEnv->regs[regionNumber].wins[newEnv->regs[regionNumber].winCount-1],0,&tainted,&taintedCount);
+        if(newEnv->regs[regionNumber].head)
+        taintedCorrect(newEnv->regs[regionNumber].wins[newEnv->regs[regionNumber].winCount-1],event.xvisibility.state,newEnv);
+         fprintf(stderr,"WINS IN REGION{{%d}}:%d\n",regionNumber,newEnv->regs[regionNumber].winCount);
+        newEnv->regs[regionNumber].head=0;
       }
       break;
     case ButtonPress:
@@ -60,7 +64,7 @@ unsigned char dispatch(winHandl *newEnv) {
       break;
     case MotionNotify:
       flag = motion(&event, newEnv, truePos);
-     // fprintf(stderr,"%d\n",taintedCount);
+      
       break;
     case KeyPress:
       if (event.xkey.keycode == K_ESC)
