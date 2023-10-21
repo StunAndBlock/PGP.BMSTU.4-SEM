@@ -1,16 +1,18 @@
+
 all:combinations
-combinations: combinations_C winCombinations_C numCombinations_C 
-	cc -o combinations combinations.o winCombinations.o numCombinations.o -lX11 -g -lm
-combinations_C:
-	cc -c combinations.c -g
+combinations: combinations.o winCombinations.o numCombinations.o choose.o
+	cc -o build/combinations combinations.o winCombinations.o numCombinations.o choose.o -lX11 -lm
+combinations.o: combinations.c combinations.h
+	cc -c combinations.c
 
-winCombinations_C: 
-	cc -c winCombinations.c -g 
+winCombinations.o: winCombinations.c
+	cc -c winCombinations.c
 
+numCombinations.o: numCombinations.c
+	cc -c numCombinations.c
 
-numCombinations_C:
-	cc -c numCombinations.c -g 
-
+choose.o: choose.c choose.h
+	cc -c choose.c 
 
 clean:
-	rm -rf *.o
+	rm -rf *.o build/combinations

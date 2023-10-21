@@ -2,10 +2,9 @@
 #define COMBINATIONS_H_
 #include <X11/Xlib.h>
 #define CELL_COUNT 3
-#define CELL_SIZE_FORM 190
+#define CELL_SIZE_FORM 180
 // BASE SIZE + BORDER SIZE + OFFSET;
 #define OFFSET 5
-#define WIN_W 400
 #define WIN_H CELL_SIZE_FORM*CELL_COUNT+OFFSET*(CELL_COUNT+1)
 #define K_ESC 9
 #define ALT 64
@@ -16,7 +15,9 @@ typedef struct Form {
   XRectangle brace_1;
   XRectangle brace_2;
   XRectangle C;
-  
+  XRectangle comma;
+  XRectangle equally;
+  XRectangle result;
 } Form;
 
 
@@ -25,7 +26,7 @@ typedef struct env {
   Display *dpy;
   Window root;
   Window viewform;
-  Form forms[3];
+  Form forms[5];
   GC gc_C;
   GC gc_Num;
   Window exit;
@@ -41,17 +42,19 @@ typedef struct Combination_base {
   char* C;
   char* brace_1;
   char* brace_2;
+  char* comma;
+  char* equally;
+  unsigned long long result;
+  char* result_str;
+  size_t result_len;
 } Cb;
 
 void dispatch(winEnv *,Cb*);
-void createEnv(winEnv *);
+void createEnv(winEnv *,Cb*);
 void freeEnv(winEnv *);
+void freeComb(Cb* );
 
-void invertBit(unsigned char, winEnv *);
-unsigned char control(Window, winEnv *);
-unsigned char _pow(unsigned char);
-
-void keycontrol(unsigned int, winEnv *);
+unsigned char keycontrol(unsigned int, winEnv *);
 void arrangeForm(winEnv *,Cb*);
 void convertString(Cb*);
 void configFonts(winEnv *,Cb* );
