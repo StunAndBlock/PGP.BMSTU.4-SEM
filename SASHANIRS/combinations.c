@@ -2,11 +2,12 @@
 #include "stdio.h"
 int main(void) {
   winEnv newEnv;
-  ODH num;
   createEnv(&newEnv);
-  int ber;
-  scanf("%d",&ber);
-  dispatch(&newEnv, &num);
+  Cb comb;
+  scanf("%d%d",&comb.n,&comb.m);
+  convertString(&comb);
+  configFonts(&newEnv,&comb);
+  dispatch(&newEnv,&comb);
   XDestroySubwindows(newEnv.dpy, newEnv.root);
   XDestroyWindow(newEnv.dpy, newEnv.root);
   freeEnv(&newEnv);
@@ -14,7 +15,7 @@ int main(void) {
   
 }
 
-void dispatch(winEnv *env, ODH *num) {
+void dispatch(winEnv *env,Cb* comb) {
   unsigned char flag = 1;
   char e = 0;
   XEvent event;
@@ -24,15 +25,14 @@ void dispatch(winEnv *env, ODH *num) {
     switch (event.type) {
       break;
     case KeyPress:
-      keycontrol(event.xkey.keycode, env, num);
+      keycontrol(event.xkey.keycode, env);
       break;
     case ButtonPress:
-      flag = control(event.xbutton.window, env, num);
+      flag = control(event.xbutton.window, env);
       break;
 
     default:
-      XDrawString(env->dpy, env->root, env->gc[0], 60,
-                  60, "C", 1);
+      arrangeForm(env,comb);
       break;
     }
   }

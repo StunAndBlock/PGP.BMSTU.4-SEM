@@ -2,39 +2,57 @@
 #define COMBINATIONS_H_
 #include <X11/Xlib.h>
 #define CELL_COUNT 3
-#define CELL_SIZE_FORM 120
+#define CELL_SIZE_FORM 190
 // BASE SIZE + BORDER SIZE + OFFSET;
 #define OFFSET 5
 #define WIN_W 400
 #define WIN_H CELL_SIZE_FORM*CELL_COUNT+OFFSET*(CELL_COUNT+1)
 #define K_ESC 9
 #define ALT 64
+typedef struct Form {
+  Window win;
+  XRectangle m;
+  XRectangle n;
+  XRectangle brace_1;
+  XRectangle brace_2;
+  XRectangle C;
+  
+} Form;
+
+
+
 typedef struct env {
   Display *dpy;
   Window root;
   Window viewform;
-  Window forms[3];
-  GC gc[2];
-  XRectangle cell;
+  Form forms[3];
+  GC gc_C;
+  GC gc_Num;
   Window exit;
 } winEnv;
 
-typedef struct ODH { // BINARY OCTAL DEC HEX
-  unsigned char bin[CELL_COUNT][1];
-  unsigned char *hexOctDec;
-  unsigned char len;
-} ODH;
+typedef struct Combination_base {
+  int n;
+  int m;
+  char* n_str;
+  char* m_str;
+  size_t n_len;
+  size_t m_len;
+  char* C;
+  char* brace_1;
+  char* brace_2;
+} Cb;
 
-void dispatch(winEnv *, ODH *num);
+void dispatch(winEnv *,Cb*);
 void createEnv(winEnv *);
 void freeEnv(winEnv *);
-void convertToHexOct(ODH *, unsigned char);
-void constructODH(winEnv *, ODH *);
-void convertToDec(ODH *);
-void eraseConvert(winEnv *env, ODH *num, char);
-void invertBit(unsigned char, winEnv *, ODH *);
-unsigned char control(Window, winEnv *, ODH *);
+
+void invertBit(unsigned char, winEnv *);
+unsigned char control(Window, winEnv *);
 unsigned char _pow(unsigned char);
-void fill(winEnv *, ODH *);
-void keycontrol(unsigned int, winEnv *, ODH *);
+
+void keycontrol(unsigned int, winEnv *);
+void arrangeForm(winEnv *,Cb*);
+void convertString(Cb*);
+void configFonts(winEnv *,Cb* );
 #endif /*W07_H_*/
