@@ -1,31 +1,62 @@
 #include "practice.h"
 #include "figures.hpp"
 
-Graph::Graph(const std::string & str) { // конструктор (аргумент - имя файла)
-	std::ifstream fin;
-	fin.open(str);
-	if (!fin.is_open()) { // проверка на открытие файла
-		std::cout << "Файл " << str << " не удалось открыть!" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	fin >> number_of_vertices;
-	fin >> number_of_ribs;
+// Graph::Graph(const std::string & str) { // конструктор (аргумент - имя файла)
+// 	std::ifstream fin;
+// 	fin.open(str);
+// 	if (!fin.is_open()) { // проверка на открытие файла
+// 		std::cout << "Файл " << str << " не удалось открыть!" << std::endl;
+// 		exit(EXIT_FAILURE);
+// 	}
+// 	fin >> number_of_vertices;
+// 	fin >> number_of_ribs;
+// 	size_t u, v;
+// 	adjacency_matrix = new std::vector<size_t>[number_of_vertices];
+// 	for (size_t i = 0; i < number_of_ribs; ++i) {
+//         fin >> u >> v; // ребро между вершинами u и v
+//         adjacency_matrix[u].push_back(v);
+//         adjacency_matrix[v].push_back(u); // добавляем обратное ребро для неориентированного графа
+//     }
+//     vertex_label = new bool[number_of_vertices];
+//     for (size_t i = 0; i < number_of_vertices; ++i)
+//     	vertex_label[i] = false;
+// 	fin.close();
+// }
+
+Graph::Graph(){
+    figure_ptr_array.push_back(tetrahedron_figure);
+    figure_ptr_array.push_back(octahedron_figure);
+    figure_ptr_array.push_back(cube_figure);
+    figure_ptr_array.push_back(icosahedron_figure);
+    figure_ptr_array.push_back(dodecahedron_figure);
+}
+
+void Graph::initGraph(int option_number){
+    number_of_vertices=number_of_vertices_arr[option_number];
+	number_of_ribs=number_of_ribs_arr[option_number];
 	size_t u, v;
 	adjacency_matrix = new std::vector<size_t>[number_of_vertices];
 	for (size_t i = 0; i < number_of_ribs; ++i) {
-        fin >> u >> v; // ребро между вершинами u и v
+        u=figure_ptr_array[option_number][i][0];
+        v=figure_ptr_array[option_number][i][1];
+         // ребро между вершинами u и v
         adjacency_matrix[u].push_back(v);
         adjacency_matrix[v].push_back(u); // добавляем обратное ребро для неориентированного графа
     }
     vertex_label = new bool[number_of_vertices];
     for (size_t i = 0; i < number_of_vertices; ++i)
     	vertex_label[i] = false;
-	fin.close();
 }
 
 Graph::~Graph() { // деструктор
 	delete[] adjacency_matrix;
 	delete[] vertex_label;
+}
+
+void Graph::graphFree(){
+    delete[] adjacency_matrix;
+	delete[] vertex_label;
+    tree.clear();
 }
 
 Environment::~Environment() { // деструктор
@@ -38,6 +69,13 @@ Environment::~Environment() { // деструктор
     XFreeGC(dpy,gc_red);
     XFreeFont(dpy,fn);
     XCloseDisplay(dpy);
+}
+void Environment::environmentFree(){
+	delete[] vertices.blank_arcs;
+	delete[] vertices.external_arcs;
+    delete[] vertices.internal_arcs;
+    delete[] vertices.points;
+
 }
 
 void Graph::algorithmBFS() {
@@ -60,7 +98,6 @@ void Graph::algorithmBFS() {
                 tree.push_back(temp);
                 temp.clear();
                 //std::copy(temp.begin(),temp.end(),std::back_inserter(tree));
-                std::cout << current_vertex << " " << next << std::endl; // добавляем ребро в дерево 
             }
         }
     }
@@ -105,7 +142,7 @@ std::vector<std::vector<double> > get_template(size_t number_of_vertices){
 }
 
 
-void Environment::prepareGraph(size_t number_of_vertices){
+bool Environment::prepareGraph(size_t number_of_vertices){
     graph_template = get_template(number_of_vertices);
     vertices.points = new XPoint[number_of_vertices];
     vertices.external_arcs = new XArc[number_of_vertices];
@@ -135,9 +172,18 @@ void Environment::prepareGraph(size_t number_of_vertices){
             vertices.internal_arcs[i].angle2=vertices.external_arcs[i].angle2;
 
         }
-        
+    return true;
 }
 
+
+int findWindow(Window* where,size_t where_size,Window what){
+    for (size_t i=0;i<where_size;i++){
+        if(where[i]==what){
+            return i;
+        }
+    }
+    return -1;
+}
 
 
 

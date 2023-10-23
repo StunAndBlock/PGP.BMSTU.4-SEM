@@ -28,6 +28,8 @@
 #define WIN_HEIGHT DRAW_FIELD_HEIGHT+2
 #define OPTION_FILED_HEIGHT WIN_HEIGHT
 #define BUTTON_HEIGHT 50
+
+#define FIGURE_COUNT 5
 class Vertices{
 public:
 	XPoint* points;
@@ -39,19 +41,23 @@ public:
 
 class Graph {
 private:
+	std::vector<std::vector <std::vector<size_t>>> figure_ptr_array;
 	std::vector<size_t> * adjacency_matrix; // матрица смежности
 	size_t number_of_vertices; // количество вершин
 	size_t number_of_ribs; // количество ребер
 	bool * vertex_label; // массив меток
 	std::vector<std::vector<size_t>> tree;
 public:
-	explicit Graph(const std::string & str); // конструктор (аргумент - имя файла)
+	// explicit Graph(const std::string & str); // конструктор (аргумент - имя файла)
+	Graph();
 	~Graph(); // деструктор
 	void algorithmBFS();
+	void initGraph(int);
 	size_t get_num_of_ribs();
 	size_t get_num_of_vertices();
 	std::vector<size_t>* get_adjacency_matrix();
 	std::vector<std::vector<size_t>> get_tree();
+	void graphFree();
 };
 
 
@@ -62,6 +68,7 @@ private:
 	Window option_field_win;
 	Window draw_button_win;
 	Window draw_field_win;
+	Window option_figures[FIGURE_COUNT];
 	GC gc_white;
 	GC gc_black;
 	GC gc_red;
@@ -69,17 +76,22 @@ private:
 	int scr;
 	int depth;
 	Vertices vertices;
+	bool is_inited;
 	std::vector<std::vector<double> >graph_template;
 public:
-	Environment(const std::string & str );
+	// Environment(const std::string & str );
+	Environment();
 	~Environment();
-	void dispatch(size_t);
-	void prepareGraph(size_t);
+	void dispatch();
+	bool prepareGraph(size_t);
 	void drawGraph(size_t);
 	void drawTree(size_t);
+	void drawButtons();
+	void environmentFree();
 };
 
 
 std::vector<std::vector<double> > get_template(size_t);
+int findWindow(Window*,size_t,Window );
 
 #endif

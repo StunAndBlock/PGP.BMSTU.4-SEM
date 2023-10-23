@@ -1,6 +1,7 @@
 #include "practice.h"
 
-Environment::Environment(const std::string & str):Graph(str){
+Environment::Environment():Graph(){
+  is_inited=false;
   dpy = XOpenDisplay(NULL);
   scr = DefaultScreen(dpy);
   depth = DefaultDepth(dpy, scr);
@@ -37,6 +38,12 @@ Environment::Environment(const std::string & str):Graph(str){
   draw_button_win = XCreateWindow(dpy, option_field_win, -1, -1, BUTTON_WIDTH,
           BUTTON_HEIGHT, 1, depth, InputOutput, CopyFromParent,
           (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
+  size_t dy=BUTTON_HEIGHT;
+  for(size_t i=0;i<FIGURE_COUNT;i++,dy+=BUTTON_HEIGHT){
+    option_figures[i] = XCreateWindow(dpy, option_field_win, -1, dy, BUTTON_WIDTH,
+          BUTTON_HEIGHT, 1, depth, InputOutput, CopyFromParent,
+          (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
+  }
   attr.event_mask = (ExposureMask);
   draw_field_win = XCreateWindow(dpy, main_win, OPTION_FIELD_WIDTH+1, 0, DRAW_FIELD_WIDTH,
           DRAW_FIELD_HEIGHT, 1, depth, InputOutput, CopyFromParent,
@@ -52,37 +59,66 @@ Environment::Environment(const std::string & str):Graph(str){
   XMapSubwindows(dpy, option_field_win);           
 }
 
-void Environment::dispatch(size_t num_of_vertices){
+void Environment::dispatch(){
   unsigned char flag = 1;
   char e = 0;
   XEvent event;
-
+  int option_number=0;
   while (flag) {
     XNextEvent(dpy, &event);
     switch (event.type) {
       break;
     case ButtonPress:
-      drawTree(num_of_vertices);
+      if(event.xbutton.window!=draw_button_win){
+        option_number=findWindow(option_figures,FIGURE_COUNT,event.xbutton.window);
+      if(is_inited){
+        this->graphFree();
+        this->environmentFree();
+      }
+      if(option_number!=-1){
+      this->initGraph(option_number);
+      this->algorithmBFS();
+      this->prepareGraph(this->get_num_of_vertices());
+      this->drawGraph(this->get_num_of_vertices());
+      is_inited=true;
+      }
+      } else if(is_inited) {
+        drawTree(this->get_num_of_vertices());
+      }
       break;
     case KeyPress:
       if(event.xkey.keycode==9){
         flag=0;
       }
     default:
-      drawGraph(num_of_vertices);
+      drawButtons();
       break;
     }
   }
   
 }
 
-void Environment::drawGraph(size_t num_of_vertices){
-  //XDrawPoints(dpy,main_win,gc_black,vertices.points,num_of_vertices,CoordModeOrigin);
+void Environment::drawButtons(){
+  std::vector<std::string> button_names = {"Tetrahedron","Octahedron","Cube","Icosahedron","Dodecahedron"};
   XDrawString(dpy,draw_button_win,gc_black,
   (BUTTON_WIDTH-fn->max_bounds.width*4)/2,
   (BUTTON_HEIGHT/2 + (fn->max_bounds.ascent - fn->max_bounds.descent) / 2),
   "draw",
   4);
+  for(size_t i = 0;i< FIGURE_COUNT;i++){
+  XDrawString(dpy,option_figures[i],gc_black,
+  (BUTTON_WIDTH-fn->max_bounds.width*button_names[i].length())/2,
+  (BUTTON_HEIGHT/2 + (fn->max_bounds.ascent - fn->max_bounds.descent) / 2),
+  button_names[i].c_str(),
+  button_names[i].length());   
+  }
+}
+
+void Environment::drawGraph(size_t num_of_vertices){
+  //XDrawPoints(dpy,main_win,gc_black,vertices.points,num_of_vertices,CoordModeOrigin);
+  if(is_inited){
+    XFillRectangle(dpy,draw_field_win,gc_white,0,0,DRAW_FIELD_WIDTH,DRAW_FIELD_HEIGHT);
+  }
   XDrawArcs(dpy,draw_field_win,gc_black,vertices.external_arcs,num_of_vertices);
   XFillArcs(dpy,draw_field_win,gc_black,vertices.external_arcs,num_of_vertices);
   
