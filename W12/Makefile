@@ -15,6 +15,5 @@ calculations: l_calculations.c l_calculations-definitions.h g_configurations.h
 
 rebuild: clean all
 
-
 clean:
 	rm *.o ./${NAME}
