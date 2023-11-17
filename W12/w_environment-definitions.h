@@ -7,6 +7,7 @@ void configurateFonts(Envi*);
 void configurateColors(Envi*);
 void configurateWindows(Envi*);
 int findWindow(Window*, Window);
-
+void paint(Display* ,Window* ,char* ,GC ,int ,XRectangle);
+void freeEnvironment(Envi*);
 
 #endif //END OF W_ENVIRONMENT_SETUP_DEFINITIONS

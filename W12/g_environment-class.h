@@ -10,6 +10,7 @@ int depth;
 GC paint_gc;
 GC erase_gc;
 XRectangle font_aligns;
+XRectangle font_aligns_exit;
 Window root_win;
 Window main_win;
 Window exit_win;

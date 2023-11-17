@@ -22,7 +22,11 @@ void configurateFonts(Envi* p){
     p->font_aligns.width = fn->max_bounds.width;
     p->font_aligns.height = fn->max_bounds.ascent + fn->max_bounds.descent;
     p->font_aligns.x = (BIT_WINDOW_WIDTH - p->font_aligns.width)/2;
-    p->font_aligns.y = BIT_WINDOW_WIDTH / 2 + (fn->max_bounds.ascent - fn->max_bounds.descent) / 2;
+    p->font_aligns.y = BIT_WINDOW_HEIGHT / 2 + (fn->max_bounds.ascent - fn->max_bounds.descent) / 2;
+    p->font_aligns_exit.width =  fn->max_bounds.width * EXIT_BUTTON_TEXT_LENGTH;
+    p->font_aligns_exit.height = fn->max_bounds.ascent + fn->max_bounds.descent;
+    p->font_aligns_exit.x = (EXIT_WINDOW_WIDTH - p->font_aligns_exit.width)/2;
+    p->font_aligns_exit.y = EXIT_WINDOW_HEIGHT /2 + (fn->max_bounds.ascent - fn->max_bounds.descent) / 2;
     XFreeFont(p->dpy,fn);
 
 }
@@ -40,28 +44,41 @@ void configurateWindows(Envi* p){
     XSizeHints hint;
     attr.background_pixel = BGCM;
     attr.override_redirect = False;
-    attr.event_mask = (ExposureMask);
+    attr.event_mask = (ExposureMask | KeyPressMask);
     p->main_win = XCreateWindow(p->dpy ,DefaultRootWindow(p->dpy) ,0 ,0 ,MAIN_WINDOW_WIDTH ,MAIN_WINDOW_HEIGHT ,0 ,
                                 p->depth, InputOutput, CopyFromParent, (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
-    attr.background_pixel = COLOR_BLACK_HEX;
-    attr.override_redirect = False;
-    attr.event_mask = (ButtonPressMask);
     p->rowsblock_win = XCreateWindow(p->dpy, p->main_win ,X_OFFSET ,Y_OFFSET ,BIT_ROW_WINDOW_WIDTH ,BIT_ROW_WINDOW_HEIGHT ,0 ,
-                                p->depth, InputOutput, CopyFromParent, (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
+                                p->depth, InputOutput, CopyFromParent,0 , NULL);
     p->complementbinrowblock_win = XCreateWindow(p->dpy, p->main_win ,X_OFFSET ,Y_OFFSET*2 + BIT_ROW_WINDOW_HEIGHT ,BIT_ROW_WINDOW_WIDTH ,BIT_ROW_WINDOW_HEIGHT ,0 ,
-                                p->depth, InputOutput, CopyFromParent ,0 , NULL);
+                                p->depth, InputOutput, CopyFromParent ,0 ,NULL);
     
     attr.background_pixel = BGCB;
     attr.override_redirect = False;
     attr.event_mask = (ButtonPressMask);
-    for(int i = 0; i < BIT_WINDOW_AMOUNT; i++){
-        p->binrow_wins[i] = XCreateWindow(p->dpy, p->rowsblock_win ,(X_OFFSET+BIT_WINDOW_WIDTH)*i ,Y_OFFSET ,BIT_WINDOW_WIDTH ,BIT_WINDOW_HEIGHT ,0 ,
+    int dx = 0;
+    for(int i = 0; i < BIT_WINDOW_AMOUNT; i++,dx+=(X_OFFSET+BIT_WINDOW_WIDTH)){
+        if(i%4==0 && i){
+            dx+=GAP;
+        }
+        p->binrow_wins[i] = XCreateWindow(p->dpy, p->rowsblock_win ,dx ,Y_OFFSET ,BIT_WINDOW_WIDTH ,BIT_WINDOW_HEIGHT ,0 ,
                                 p->depth, InputOutput, CopyFromParent, (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
     }
-    for(int i = 0; i < BIT_WINDOW_AMOUNT; i++){
-        p->complementbinrow_wins[i] = XCreateWindow(p->dpy, p->complementbinrowblock_win ,(X_OFFSET+BIT_WINDOW_WIDTH)*i ,Y_OFFSET ,BIT_WINDOW_WIDTH ,BIT_WINDOW_HEIGHT ,0 ,
+    dx = 0;
+    for(int i = 0; i < BIT_WINDOW_AMOUNT; i++,dx+=(X_OFFSET+BIT_WINDOW_WIDTH)){
+        if(i%4==0 && i){
+            dx+=GAP;
+        }
+        p->complementbinrow_wins[i] = XCreateWindow(p->dpy, p->complementbinrowblock_win ,dx ,Y_OFFSET ,BIT_WINDOW_WIDTH ,BIT_WINDOW_HEIGHT ,0 ,
                                 p->depth, InputOutput, CopyFromParent, (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
-    }                                     
+    }
+    attr.background_pixel = COLOR_BLACK_HEX;
+    p->exit_win = XCreateWindow(p->dpy, p->main_win ,dx ,Y_OFFSET ,EXIT_WINDOW_WIDTH ,EXIT_WINDOW_HEIGHT ,0 ,
+                                p->depth, InputOutput, CopyFromParent, (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);                                      
+    
+    hint.flags = (PMinSize | PMaxSize);
+    hint.min_width = hint.max_width = MAIN_WINDOW_WIDTH;
+    hint.min_height = hint.max_height = MAIN_WINDOW_HEIGHT;
+    XSetNormalHints(p->dpy,p->main_win,&hint);
     XMapWindow(p->dpy,p->main_win);
     XMapSubwindows(p->dpy,p->main_win);
     XMapSubwindows(p->dpy,p->rowsblock_win);
@@ -69,10 +86,23 @@ void configurateWindows(Envi* p){
 }
 
 int findWindow(Window* where,Window source){
-    for(int i = 0; i<BIT_WINDOW_AMOUNT; i++){
+    int i = 0;
+    for(i = 0; i<BIT_WINDOW_AMOUNT; i++){
         if(where[i]==source){
             return i;
         }
-    }
+    }   
     return -1;
 }
+
+void paint(Display* dpy, Window* drawable,char* source,GC gc,int count,XRectangle pos){
+    for(int i = 0; i < count; i++){
+        XDrawString(dpy,drawable[i],gc,pos.x,pos.y,&source[i],1);
+    }
+}
+
+void freeEnvironment(Envi* p){
+    XFreeGC(p->dpy,p->erase_gc);
+    XCloseDisplay(p->dpy);
+}
+
