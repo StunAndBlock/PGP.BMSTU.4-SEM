@@ -18,9 +18,9 @@
 #define X_OFFSET 2
 #define Y_OFFSET 2
 
-
+#define FONT_SIZE 50
 #define _XK_ESCAPE 0xff1b
-#define BIT_WINDOW_WIDTH 48
+#define BIT_WINDOW_WIDTH (FONT_SIZE - 2)
 #define BIT_WINDOW_HEIGHT BIT_WINDOW_WIDTH 
 #define EXIT_BUTTON_TEXT "X"
 #define EXIT_BUTTON_TEXT_LENGTH 1

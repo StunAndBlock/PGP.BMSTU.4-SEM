@@ -61,7 +61,7 @@ int dispatch(Envi* p){
                 if (ta){ 
                 paint(p->dpy,p->binrow_wins,p->bin_str,p->paint_gc,BIT_WINDOW_AMOUNT,p->font_aligns);
                 paint(p->dpy,p->complementbinrow_wins,p->complementbin_str,p->paint_gc,BIT_WINDOW_AMOUNT,p->font_aligns);
-                XFillRectangle(p->dpy ,p->exit_win ,p->erase_gc ,X_OFFSET ,Y_OFFSET,EXIT_WINDOW_WIDTH - X_OFFSET * 2, EXIT_WINDOW_HEIGHT - X_OFFSET);
+                XFillRectangle(p->dpy ,p->exit_win ,p->erase_gc ,X_OFFSET ,Y_OFFSET,EXIT_WINDOW_WIDTH - X_OFFSET * 2, EXIT_WINDOW_HEIGHT - Y_OFFSET);
                 XDrawString(p->dpy, p->exit_win, p->paint_gc ,p->font_aligns_exit.x ,p->font_aligns_exit.y ,EXIT_BUTTON_TEXT,EXIT_BUTTON_TEXT_LENGTH);
                 ta=0;
                 }

@@ -1,7 +1,8 @@
 #include "./g_environment-class.h"
 #include "./g_configurations.h"
 #include "X11/Xutil.h"
-
+#include "stdio.h"
+#include "string.h"
 
 void prepare(Envi* p){
     p->dpy = XOpenDisplay(NULL);
@@ -14,7 +15,13 @@ void prepare(Envi* p){
 
 void configurateFonts(Envi* p){
     XFontStruct *fn;
-    const char fontname_C[] = "-bitstream-courier 10 pitch-medium-r-normal--50-0-0-0-m-0-iso10646-1";
+    char fontname_C[150] = "-bitstream-courier 10 pitch-medium-r-normal--";
+    char font_suff[] = "-0-0-0-m-0-iso10646-1";
+    size_t length_x = snprintf( NULL, 0, "%d", FONT_SIZE );
+    char fs[length_x+1];
+    snprintf( fs, length_x+1, "%d", FONT_SIZE );
+    strcat(fontname_C,fs);
+    strcat(fontname_C,font_suff);
     if ((fn = XLoadQueryFont(p->dpy, fontname_C)) == NULL)
     return;
     XSetFont(p->dpy, p->paint_gc, fn->fid);
@@ -47,10 +54,11 @@ void configurateWindows(Envi* p){
     attr.event_mask = (ExposureMask | KeyPressMask);
     p->main_win = XCreateWindow(p->dpy ,DefaultRootWindow(p->dpy) ,0 ,0 ,MAIN_WINDOW_WIDTH ,MAIN_WINDOW_HEIGHT ,0 ,
                                 p->depth, InputOutput, CopyFromParent, (CWOverrideRedirect | CWBackPixel | CWEventMask), &attr);
+    attr.background_pixel = COLOR_BLACK_HEX;
     p->rowsblock_win = XCreateWindow(p->dpy, p->main_win ,X_OFFSET ,Y_OFFSET ,BIT_ROW_WINDOW_WIDTH ,BIT_ROW_WINDOW_HEIGHT ,0 ,
-                                p->depth, InputOutput, CopyFromParent,0 , NULL);
+                                p->depth, InputOutput, CopyFromParent,(CWBackPixel) , &attr);
     p->complementbinrowblock_win = XCreateWindow(p->dpy, p->main_win ,X_OFFSET ,Y_OFFSET*2 + BIT_ROW_WINDOW_HEIGHT ,BIT_ROW_WINDOW_WIDTH ,BIT_ROW_WINDOW_HEIGHT ,0 ,
-                                p->depth, InputOutput, CopyFromParent ,0 ,NULL);
+                                p->depth, InputOutput, CopyFromParent ,(CWBackPixel) ,&attr);
     
     attr.background_pixel = BGCB;
     attr.override_redirect = False;
