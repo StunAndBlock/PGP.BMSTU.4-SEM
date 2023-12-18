@@ -7,7 +7,7 @@ int dispatch(Envi*);
 int main(){
     Envi prog;
     prepare(&prog);
-    // configurateFonts(&prog);
+    calculateTraces(&prog);
     configurateColors(&prog);
     configuratePixmap(&prog);
     configurateWindows(&prog);
@@ -22,10 +22,13 @@ int dispatch(Envi* p){
     int winNum = -1;
     int parent = -1;
     int ta = 1;
+    int count=0;
     XEvent event;
     while (flag) {
+        event.type = 0;
         XCheckWindowEvent(p->dpy, p->main_win, (ExposureMask | KeyPressMask | StructureNotifyMask | KeyReleaseMask |
            FocusChangeMask), &event);
+        // XNextEvent(p->dpy,&event);
         switch (event.type) {
             break;
             case KeyPress:
@@ -42,7 +45,15 @@ int dispatch(Envi* p){
                 ta=0;
                 }
             break;
+        }
+    if(count == VELOCITY_PSEUDO){
+    XClearWindow(p->dpy,p->main_win);
+    move_in_helix(p);
+    count=0;
+    } else {
+        count++;
     }
-    printf("1");
+
   }
+  
 }

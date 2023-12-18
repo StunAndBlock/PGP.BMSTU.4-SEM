@@ -4,6 +4,20 @@
 #include "X11/Xlib.h"
 #include "./g_configurations.h"
 
+typedef struct Orb {
+    int is_determined;
+    XRectangle* trajectory;
+    int direction;
+} Orb;
+
+typedef struct Helix
+{
+    XRectangle pos;
+    int width;
+    int height;
+} Helix;
+
+
 typedef struct Environment {
 Display* dpy;
 int depth;
@@ -14,6 +28,9 @@ XRectangle font_aligns_exit;
 Window root_win;
 Window main_win;
 Pixmap main_pix;
+Orb in_Helix;
+Orb on_click;
+Helix hx[HELIX_ARCS + 2];
 } Envi;
 // typedef struct Environment Envi;
 

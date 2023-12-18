@@ -8,7 +8,7 @@ void configurateColors(Envi*);
 void configurateWindows(Envi*);
 void configuratePixmap(Envi*);
 int findWindow(Window*, int, Window);
-void paint(Display* ,Window* ,char* ,GC ,int ,XRectangle);
+void paint(Display* dpy, Window* drawable, GC gc, XRectangle pos);
 void freeEnvironment(Envi*);
-
+void move_in_helix(Envi*);
 #endif //END OF W_ENVIRONMENT_SETUP_DEFINITIONS

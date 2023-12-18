@@ -3,8 +3,11 @@
 #include "X11/Xutil.h"
 #include "stdio.h"
 #include "string.h"
+#include "stdlib.h"
 
 void prepare(Envi* p){
+    p->in_Helix.is_determined=1;
+    p->in_Helix.trajectory = (XRectangle*)malloc(sizeof(XRectangle)*DOTS);
     p->dpy = XOpenDisplay(NULL);
     int scr = DefaultScreen(p->dpy);
     p->depth = DefaultDepth(p->dpy,scr);
@@ -51,30 +54,30 @@ void configurateColors(Envi* p){
 
 void configuratePixmap(Envi* p){
     XFillRectangle(p->dpy, p->main_pix, p->erase_gc, 0, 0, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
-    int r = HELIX_RADIUS;
-    int old_r = 0;
     // XDrawLine(p->dpy, p->main_pix, p->paint_gc, MAIN_WINDOW_WIDTH/2, 0, MAIN_WINDOW_WIDTH/2, MAIN_WINDOW_HEIGHT);
     // XDrawLine(p->dpy, p->main_pix, p->paint_gc, 0, MAIN_WINDOW_HEIGHT/2, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT/2);
-    int x = MAIN_WINDOW_WIDTH/2;
-    int y = MAIN_WINDOW_HEIGHT/2 - r;
-    XDrawArc(p->dpy, p->main_pix, p->paint_gc, x, y, r*2, r*2,0, -180*64);
-    int state = 1;
-    for(int i = 0; i < HELIX_ARCS; i++, state = -state){
-    old_r = r;
-    r+=ARC_DELTA;
-    if(!(i%2)){
-        x = x + 2 * (old_r - r);
-    }
-    y = MAIN_WINDOW_HEIGHT/2 - r;
-    XDrawArc(p->dpy, p->main_pix, p->paint_gc, x, y, r*2, r*2,0, state * 180*64);
+    int state = -1;
+    for(int i = 0; i <=HELIX_ARCS; i++, state = -state){
+    XDrawArc(p->dpy, p->main_pix, p->paint_gc, p->hx[i].pos.x, p->hx[i].pos.y, p->hx[i].width, p->hx[i].height,0, state * 180*64);
     }
     state = -state;
-    old_r = r;
-    r+=ARC_DELTA;
-    x = x + 2 * (old_r - r);
-    y = MAIN_WINDOW_HEIGHT/2 - r;
-    XDrawArc(p->dpy, p->main_pix, p->paint_gc, x, y, r*2, r*2,90*64, state * 90*64);
+    XDrawArc(p->dpy, p->main_pix, p->paint_gc, p->hx[HELIX_ARCS+1].pos.x, p->hx[HELIX_ARCS+1].pos.y, p->hx[HELIX_ARCS+1].width, p->hx[HELIX_ARCS+1].height,90*64, state * 90*64);
 
+}
+
+void paint(Display* dpy, Window drawable, GC gc, XRectangle pos){
+    XDrawArc(dpy,drawable,gc,pos.x-HELIX_ORB_RADIUS,pos.y - HELIX_ORB_RADIUS, HELIX_ORB_RADIUS*2,HELIX_ORB_RADIUS*2,0,360*64);
+}
+
+
+void move_in_helix(Envi* p){  
+    static int i = 1;
+    //paint(p->dpy,p->main_win,p->erase_gc,p->in_Helix.trajectory[i-1]);
+    paint(p->dpy,p->main_win,p->paint_gc,p->in_Helix.trajectory[i]);
+    i++;
+    if(i == DOTS){
+        i=1;
+    }
 }
 
 void configurateWindows(Envi* p){
@@ -83,13 +86,14 @@ void configurateWindows(Envi* p){
     attr.background_pixmap = p->main_pix;
     attr.override_redirect = False;
     attr.event_mask = (ExposureMask | KeyPressMask);
+
     p->main_win = XCreateWindow(p->dpy ,DefaultRootWindow(p->dpy) ,0 ,0 ,MAIN_WINDOW_WIDTH ,MAIN_WINDOW_HEIGHT ,0 ,
-                                p->depth, InputOutput, CopyFromParent, (CWOverrideRedirect | CWBackPixmap | CWEventMask), &attr);
+                                p->depth, InputOutput, CopyFromParent, (CWOverrideRedirect | CWBackPixmap | CWEventMask ), &attr);
     
     hint.flags = (PMinSize | PMaxSize);
     hint.min_width = hint.max_width = MAIN_WINDOW_WIDTH;
     hint.min_height = hint.max_height = MAIN_WINDOW_HEIGHT;
-    XSetNormalHints(p->dpy,p->main_win,&hint);
+    // XSetNormalHints(p->dpy,p->main_win,&hint);
     XMapWindow(p->dpy,p->main_win);
     XMapSubwindows(p->dpy,p->main_win);
 
@@ -105,11 +109,6 @@ int findWindow(Window* where, int n, Window source){
     return -1;
 }
 
-void paint(Display* dpy, Window* drawable,char* source,GC gc,int count,XRectangle pos){
-    for(int i = 0; i < count; i++){
-        XDrawString(dpy,drawable[i],gc,pos.x,pos.y,&source[i],1);
-    }
-}
 
 void freeEnvironment(Envi* p){
     XFreeGC(p->dpy,p->erase_gc);
