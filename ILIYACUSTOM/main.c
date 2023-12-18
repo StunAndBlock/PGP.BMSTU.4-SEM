@@ -5,6 +5,7 @@
 int dispatch(Envi*);
 
 int main(){
+    srand(time(NULL));
     Envi prog;
     prepare(&prog);
     calculateTraces(&prog);
@@ -24,36 +25,59 @@ int dispatch(Envi* p){
     int ta = 1;
     int count=0;
     XEvent event;
+    XRectangle trace;
+    XRectangle collision[2];
     while (flag) {
         event.type = 0;
-        XCheckWindowEvent(p->dpy, p->main_win, (ExposureMask | KeyPressMask | StructureNotifyMask | KeyReleaseMask |
+        XCheckWindowEvent(p->dpy, p->main_win, (ExposureMask | KeyPressMask | StructureNotifyMask | ButtonPressMask |
            FocusChangeMask), &event);
         // XNextEvent(p->dpy,&event);
         switch (event.type) {
             break;
             case KeyPress:
                 if(event.xkey.keycode == XKeysymToKeycode(p->dpy,_XK_ESCAPE)){
-   
+                    flag = 0;
                 }
             break;
             case ButtonPress:
-            
+                if(!limit_exceded(p->orb_count)){
+                    if(event.xbutton.button == Button2){
+                        p->special = 1;
+                        
+                    }
+                    p->on_click.direction = (rand_degree()*M_PI/180);
+                    
+                    create_orb(p,event.xbutton.x,event.xbutton.y);
+                    collision[1] = move_on_click(p,p->on_click.trajectory[0]);
+                }
             break;
             default:
-                if (ta){ 
-              
-                ta=0;
-                }
             break;
         }
     if(count == VELOCITY_PSEUDO){
     XClearWindow(p->dpy,p->main_win);
-    move_in_helix(p);
+    collision[0] = move_in_helix(p);
+    fprintf(stderr,"helix:(%d %d)\n",collision[0].x,collision[0].y);
+    if(p->orb_count==ORB_LIMIT){
+        if (p->special){
+            trace = special_next_trace(collision[1],collision[0]);
+        } else {
+            trace = default_next_trace(collision[1], p->on_click.direction);
+        }
+        collision[1]=move_on_click(p,trace);
+        fprintf(stderr,"rad generated: {%lf}\n",p->on_click.direction);
+        fprintf(stderr,"custom:(%d %d)\n",collision[1].x,collision[1].y );    
+        if(is_collision(collision)){
+            fprintf(stderr,"!!!!colided (%d %d) (%d %d)\n",collision[0].x,collision[0].y,collision[1].x,collision[1].y );
+            destroyOrb(p);
+    }
+    }
+
     count=0;
     } else {
         count++;
     }
-
+    
   }
   
 }

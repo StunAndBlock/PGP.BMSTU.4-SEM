@@ -7,7 +7,7 @@
 typedef struct Orb {
     int is_determined;
     XRectangle* trajectory;
-    int direction;
+    double direction;
 } Orb;
 
 typedef struct Helix
@@ -30,7 +30,9 @@ Window main_win;
 Pixmap main_pix;
 Orb in_Helix;
 Orb on_click;
+int orb_count;
 Helix hx[HELIX_ARCS + 2];
+int special;
 } Envi;
 // typedef struct Environment Envi;
 

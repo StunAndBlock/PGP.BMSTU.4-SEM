@@ -6,8 +6,10 @@
 #include "stdlib.h"
 
 void prepare(Envi* p){
+    p->special = 0;
     p->in_Helix.is_determined=1;
     p->in_Helix.trajectory = (XRectangle*)malloc(sizeof(XRectangle)*DOTS);
+    p->orb_count = 1;
     p->dpy = XOpenDisplay(NULL);
     int scr = DefaultScreen(p->dpy);
     p->depth = DefaultDepth(p->dpy,scr);
@@ -70,7 +72,16 @@ void paint(Display* dpy, Window drawable, GC gc, XRectangle pos){
 }
 
 
-void move_in_helix(Envi* p){  
+XRectangle move_on_click(Envi* p, XRectangle dest){  
+
+    //paint(p->dpy,p->main_win,p->erase_gc,p->in_Helix.trajectory[i-1]);
+    paint(p->dpy,p->main_win,p->paint_gc,dest);
+    return dest;
+}
+
+
+
+XRectangle move_in_helix(Envi* p){  
     static int i = 1;
     //paint(p->dpy,p->main_win,p->erase_gc,p->in_Helix.trajectory[i-1]);
     paint(p->dpy,p->main_win,p->paint_gc,p->in_Helix.trajectory[i]);
@@ -78,6 +89,7 @@ void move_in_helix(Envi* p){
     if(i == DOTS){
         i=1;
     }
+    return p->in_Helix.trajectory[i];
 }
 
 void configurateWindows(Envi* p){
@@ -85,7 +97,7 @@ void configurateWindows(Envi* p){
     XSizeHints hint;
     attr.background_pixmap = p->main_pix;
     attr.override_redirect = False;
-    attr.event_mask = (ExposureMask | KeyPressMask);
+    attr.event_mask = (ExposureMask | KeyPressMask | ButtonPressMask);
 
     p->main_win = XCreateWindow(p->dpy ,DefaultRootWindow(p->dpy) ,0 ,0 ,MAIN_WINDOW_WIDTH ,MAIN_WINDOW_HEIGHT ,0 ,
                                 p->depth, InputOutput, CopyFromParent, (CWOverrideRedirect | CWBackPixmap | CWEventMask ), &attr);
@@ -97,6 +109,19 @@ void configurateWindows(Envi* p){
     XMapWindow(p->dpy,p->main_win);
     XMapSubwindows(p->dpy,p->main_win);
 
+}
+
+void create_orb(Envi* p, int x, int y ){
+    p->on_click.trajectory=(XRectangle*)malloc(sizeof(XRectangle) * 2);
+    // printf("%d %d",ev->xbutton.x,ev->xbutton.y);
+    p->on_click.trajectory[0].x=x;
+    p->on_click.trajectory[0].y=y;
+    p->orb_count+=1;
+}
+void destroyOrb(Envi* p){
+    p->special = (p->special) ? 0 : 0;
+    p->orb_count-=1;
+    free(p->on_click.trajectory);
 }
 
 int findWindow(Window* where, int n, Window source){
@@ -111,6 +136,10 @@ int findWindow(Window* where, int n, Window source){
 
 
 void freeEnvironment(Envi* p){
+    free(p->in_Helix.trajectory);
+    if (p->orb_count == 2){
+        free(p->on_click.trajectory);
+    }
     XFreeGC(p->dpy,p->erase_gc);
     XCloseDisplay(p->dpy);
 }
